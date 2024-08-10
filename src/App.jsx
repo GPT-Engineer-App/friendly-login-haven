@@ -21,7 +21,15 @@ const AppRoutes = () => {
 
   return (
     <Routes>
-      <Route path="/" element={!session ? <Index /> : <Navigate to="/dashboard" replace />} />
+      <Route path="/" element={
+        loading ? (
+          <div>Loading...</div>
+        ) : session ? (
+          <Navigate to="/dashboard" replace />
+        ) : (
+          <Index />
+        )
+      } />
       <Route path="/dashboard" element={
         <RoleBasedRoute roles={['admin', 'manager', 'employee', 'hr']}>
           <Dashboard />
