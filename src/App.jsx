@@ -8,22 +8,18 @@ import RoleBasedRoute from './components/RoleBasedRoute';
 import Index from './pages/Index';
 import Unauthorized from '@/pages/Unauthorized';
 import Dashboard from './pages/Dashboard';
-import { SupabaseAuthProvider, useSupabaseAuth } from '@/integrations/supabase/auth';
+import { AuthProvider } from '@/context/AuthContext';
 
 const queryClient = new QueryClient();
 
 const AppRoutes = () => {
-  const { session, loading } = useSupabaseAuth();
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  const { user } = useAuth();
 
   return (
     <Routes>
-      <Route path="/" element={session ? <Navigate to="/dashboard" replace /> : <Index />} />
+      <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <Index />} />
       <Route path="/dashboard" element={
-        <RoleBasedRoute roles={['admin', 'manager', 'employee', 'hr']} session={session}>
+        <RoleBasedRoute roles={['admin', 'manager', 'employee', 'hr']}>
           <Dashboard />
         </RoleBasedRoute>
       } />
@@ -32,7 +28,7 @@ const AppRoutes = () => {
           key={to} 
           path={to} 
           element={
-            <RoleBasedRoute roles={roles} session={session}>
+            <RoleBasedRoute roles={roles}>
               {page}
             </RoleBasedRoute>
           } 
@@ -47,14 +43,14 @@ const AppRoutes = () => {
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <SupabaseAuthProvider>
+      <AuthProvider>
         <TooltipProvider>
           <Toaster />
           <BrowserRouter>
             <AppRoutes />
           </BrowserRouter>
         </TooltipProvider>
-      </SupabaseAuthProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 };

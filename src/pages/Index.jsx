@@ -5,32 +5,43 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Users, AlertCircle } from 'lucide-react';
-import { useSupabaseAuth } from '@/integrations/supabase/auth';
+import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase';
 
 const Index = () => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { session } = useSupabaseAuth();
+  const { login, user } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { data, error } = await supabase
+        .from('hrms_users')
+        .select('*')
+        .eq('username', username)
+        .single();
+
       if (error) throw error;
+      if (!data) throw new Error('User not found');
+
+      // In a real-world scenario, you should use a secure password hashing library
+      // This is a simplified example for demonstration purposes
+      if (data.password_hash !== password) {
+        throw new Error('Invalid password');
+      }
+
+      await login(data);
       navigate('/dashboard');
     } catch (error) {
       setError(error.message);
     }
   };
 
-  if (session) {
+  if (user) {
     navigate('/dashboard');
     return null;
   }
@@ -50,13 +61,13 @@ const Index = () => {
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="username">Username</Label>
               <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id="username"
+                type="text"
+                placeholder="Enter your username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 required
               />
             </div>
