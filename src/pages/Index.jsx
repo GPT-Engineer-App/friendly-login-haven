@@ -3,73 +3,61 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { supabase } from '@/integrations/supabase';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/components/ui/use-toast";
+import { useHrmsUsers } from '@/integrations/supabase';
+
 const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { data: users, isLoading } = useHrmsUsers();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    try {
-      // Check if the user exists in the hrms_users table
-      const { data: user, error: userError } = await supabase
-        .from('hrms_users')
-        .select('*')
-        .eq('email', email)
-        .single();
+    if (isLoading) return;
 
-      if (userError) throw userError;
+    const user = users.find(u => u.email === email);
 
-      if (!user) {
-        toast({
-          title: "Login Failed",
-          description: "User not found. Please check your email and try again.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Compare the provided password with the stored password (plain text)
-      if (password !== user.password) {
-        toast({
-          title: "Login Failed",
-          description: "Invalid password. Please try again.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // If login is successful, navigate based on the user's role
-      switch (user.role) {
-        case 'admin':
-        case 'hr':
-          navigate('/dashboard');
-          break;
-        case 'manager':
-          navigate('/employee-management');
-          break;
-        case 'employee':
-          navigate('/attendance-tracking');
-          break;
-        default:
-          navigate('/unauthorized');
-      }
-
-      toast({
-        title: "Login Successful",
-        description: `Welcome, ${user.username}!`,
-      });
-    } catch (error) {
+    if (!user) {
       toast({
         title: "Login Failed",
-        description: error.message,
+        description: "User not found. Please check your email and try again.",
         variant: "destructive",
       });
+      return;
     }
+
+    if (password !== user.password_hash) {
+      toast({
+        title: "Login Failed",
+        description: "Invalid password. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // If login is successful, navigate based on the user's role
+    switch (user.role) {
+      case 'admin':
+      case 'hr':
+        navigate('/dashboard');
+        break;
+      case 'manager':
+        navigate('/employee-management');
+        break;
+      case 'employee':
+        navigate('/attendance-tracking');
+        break;
+      default:
+        navigate('/unauthorized');
+    }
+
+    toast({
+      title: "Login Successful",
+      description: `Welcome, ${user.username}!`,
+    });
   };
 
   return (
