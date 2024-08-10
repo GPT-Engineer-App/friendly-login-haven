@@ -9,32 +9,24 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase';
 
 const Index = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { login, user } = useAuth();
+  const { login } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
     try {
-      const { data, error } = await supabase
-        .from('hrms_users')
-        .select('*')
-        .eq('username', username)
-        .single();
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
 
       if (error) throw error;
-      if (!data) throw new Error('User not found');
 
-      // In a real-world scenario, you should use a secure password hashing library
-      // This is a simplified example for demonstration purposes
-      if (data.password_hash !== password) {
-        throw new Error('Invalid password');
-      }
-
-      await login(data);
+      await login(data.user);
       navigate('/dashboard');
     } catch (error) {
       setError(error.message);
@@ -61,13 +53,13 @@ const Index = () => {
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="username"
-                type="text"
-                placeholder="Enter your username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
