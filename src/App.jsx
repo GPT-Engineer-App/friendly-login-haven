@@ -8,7 +8,7 @@ import RoleBasedRoute from './components/RoleBasedRoute';
 import Index from './pages/Index';
 import Unauthorized from '@/pages/Unauthorized';
 import Dashboard from './pages/Dashboard';
-import { useSupabaseAuth } from '@/integrations/supabase/auth';
+import { SupabaseAuthProvider, useSupabaseAuth } from '@/integrations/supabase/auth';
 
 const queryClient = new QueryClient();
 
@@ -47,12 +47,14 @@ const AppRoutes = () => {
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </TooltipProvider>
+      <SupabaseAuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </TooltipProvider>
+      </SupabaseAuthProvider>
     </QueryClientProvider>
   );
 };
