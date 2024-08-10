@@ -12,38 +12,13 @@ import Dashboard from './pages/Dashboard';
 
 const queryClient = new QueryClient();
 
-const AuthenticatedRoutes = () => {
+const App = () => {
   const { session, loading } = useSupabaseAuth();
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
-  if (!session) {
-    return <Navigate to="/" replace />;
-  }
-
-  return (
-    <Routes>
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/unauthorized" element={<Unauthorized />} />
-      {navItems.map(({ to, page, roles }) => (
-        <Route 
-          key={to} 
-          path={to} 
-          element={
-            <RoleBasedRoute roles={roles}>
-              {page}
-            </RoleBasedRoute>
-          } 
-        />
-      ))}
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
-    </Routes>
-  );
-};
-
-const App = () => {
   return (
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
@@ -52,8 +27,21 @@ const App = () => {
             <Toaster />
             <BrowserRouter>
               <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/*" element={<AuthenticatedRoutes />} />
+                <Route path="/" element={session ? <Navigate to="/dashboard" replace /> : <Index />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/unauthorized" element={<Unauthorized />} />
+                {navItems.map(({ to, page, roles }) => (
+                  <Route 
+                    key={to} 
+                    path={to} 
+                    element={
+                      <RoleBasedRoute roles={roles}>
+                        {page}
+                      </RoleBasedRoute>
+                    } 
+                  />
+                ))}
+                <Route path="*" element={<Navigate to="/dashboard" replace />} />
               </Routes>
             </BrowserRouter>
           </TooltipProvider>
