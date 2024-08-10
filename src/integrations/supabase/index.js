@@ -672,3 +672,30 @@ export const useDeleteSavedSearchEnquiry = () => {
         },
     });
 };
+
+// User role management hooks
+export const useUserRoles = () => useQuery({
+    queryKey: ['user_roles'],
+    queryFn: () => fromSupabase(supabase.from('user_roles').select('*'))
+});
+
+export const useUpdateUserRole = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ userId, role }) => {
+            // Update the role in the user_roles table
+            await fromSupabase(supabase.from('user_roles').upsert({ user_id: userId, role }));
+            
+            // Update the user's custom claims
+            const { data, error } = await supabase.auth.admin.updateUserById(
+                userId,
+                { app_metadata: { role: role } }
+            );
+            if (error) throw error;
+            return data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries('user_roles');
+        },
+    });
+};
