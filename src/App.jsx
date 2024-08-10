@@ -7,7 +7,7 @@ import { navItems } from "./nav-items";
 import { SupabaseAuthProvider } from '@/integrations/supabase/auth';
 import RoleBasedRoute from './components/RoleBasedRoute';
 import Index from './pages/Index';
-import Unauthorized from './pages/Unauthorized';
+import Unauthorized from '@/pages/Unauthorized';
 
 const queryClient = new QueryClient();
 
