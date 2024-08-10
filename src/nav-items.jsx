@@ -21,12 +21,14 @@ export const navItems = [
     to: "/",
     icon: <Home className="h-4 w-4" />,
     page: <Index />,
+    roles: ['admin', 'manager', 'employee', 'hr'],
   },
   {
     title: "Dashboard",
     to: "/dashboard",
     icon: <PieChart className="h-4 w-4" />,
     page: <Dashboard />,
+    roles: ['admin', 'manager', 'employee', 'hr'],
   },
   {
     title: "Employee Management",

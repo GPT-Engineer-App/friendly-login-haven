@@ -592,10 +592,18 @@ export const useDeleteEnquiry = () => {
 };
 
 // Hooks for hrms_employees
-export const useHrmsEmployees = () => useQuery({
-    queryKey: ['hrms_employees'],
-    queryFn: () => fromSupabase(supabase.from('hrms_employees').select('*'))
-});
+export const useHrmsEmployees = () => {
+    const { data: session } = supabase.auth.getSession();
+    return useQuery({
+        queryKey: ['hrms_employees'],
+        queryFn: async () => {
+            const { data, error } = await supabase.from('hrms_employees').select('*');
+            if (error) throw error;
+            return data;
+        },
+        enabled: !!session
+    });
+};
 
 export const useHrmsEmployee = (id) => useQuery({
     queryKey: ['hrms_employee', id],

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,19 +21,38 @@ const Index = () => {
       if (error) throw error;
       
       // Find the corresponding employee record
-      const employee = employees.find(emp => emp.email === user.email);
-      if (!employee) {
-        throw new Error('Employee record not found');
-      }
+      const { data: employeeData, error: employeeError } = await supabase
+        .from('hrms_employees')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
 
-      // Store employee info in localStorage (or you could use a global state management solution)
-      localStorage.setItem('currentEmployee', JSON.stringify(employee));
+      if (employeeError) throw employeeError;
+      if (!employeeData) throw new Error('Employee record not found');
+
+      // Store employee info in localStorage
+      localStorage.setItem('currentEmployee', JSON.stringify(employeeData));
+
+      // Update user's custom claims with their role
+      await supabase.auth.updateUser({
+        data: { role: employeeData.role }
+      });
 
       navigate('/dashboard');
     } catch (error) {
       setError(error.message);
     }
   };
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        navigate('/dashboard');
+      }
+    };
+    checkSession();
+  }, [navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">

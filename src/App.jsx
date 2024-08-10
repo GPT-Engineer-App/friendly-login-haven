@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { navItems } from "./nav-items";
 import { supabase } from '@/integrations/supabase';
+import RoleBasedRoute from './components/RoleBasedRoute';
 
 const queryClient = new QueryClient();
 
@@ -31,11 +32,15 @@ const App = () => {
         <Toaster />
         <BrowserRouter>
           <Routes>
-            {navItems.map(({ to, page }) => (
+            {navItems.map(({ to, page, roles }) => (
               <Route 
                 key={to} 
                 path={to} 
-                element={session ? page : <Navigate to="/" replace />} 
+                element={
+                  <RoleBasedRoute roles={roles}>
+                    {page}
+                  </RoleBasedRoute>
+                } 
               />
             ))}
             <Route path="/" element={session ? <Navigate to="/dashboard" replace /> : navItems[0].page} />
