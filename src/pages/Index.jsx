@@ -4,20 +4,32 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from '@/integrations/supabase';
 import { useNavigate } from 'react-router-dom';
+import { useHrmsEmployees } from '@/integrations/supabase';
 
 const Index = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { data: employees } = useHrmsEmployees();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data: { user }, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      navigate('/dashboard'); // Redirect to dashboard after successful login
+      
+      // Find the corresponding employee record
+      const employee = employees.find(emp => emp.email === user.email);
+      if (!employee) {
+        throw new Error('Employee record not found');
+      }
+
+      // Store employee info in localStorage (or you could use a global state management solution)
+      localStorage.setItem('currentEmployee', JSON.stringify(employee));
+
+      navigate('/dashboard');
     } catch (error) {
       setError(error.message);
     }
