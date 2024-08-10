@@ -12,7 +12,7 @@ import Dashboard from './pages/Dashboard';
 
 const queryClient = new QueryClient();
 
-const App = () => {
+const AppRoutes = () => {
   const { session, loading } = useSupabaseAuth();
 
   if (loading) {
@@ -20,29 +20,39 @@ const App = () => {
   }
 
   return (
+    <Routes>
+      <Route path="/" element={!session ? <Index /> : <Navigate to="/dashboard" replace />} />
+      <Route path="/dashboard" element={
+        <RoleBasedRoute roles={['admin', 'manager', 'employee', 'hr']}>
+          <Dashboard />
+        </RoleBasedRoute>
+      } />
+      <Route path="/unauthorized" element={<Unauthorized />} />
+      {navItems.map(({ to, page, roles }) => (
+        <Route 
+          key={to} 
+          path={to} 
+          element={
+            <RoleBasedRoute roles={roles}>
+              {page}
+            </RoleBasedRoute>
+          } 
+        />
+      ))}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+};
+
+const App = () => {
+  return (
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
         <SupabaseAuthProvider>
           <TooltipProvider>
             <Toaster />
             <BrowserRouter>
-              <Routes>
-                <Route path="/" element={session ? <Navigate to="/dashboard" replace /> : <Index />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/unauthorized" element={<Unauthorized />} />
-                {navItems.map(({ to, page, roles }) => (
-                  <Route 
-                    key={to} 
-                    path={to} 
-                    element={
-                      <RoleBasedRoute roles={roles}>
-                        {page}
-                      </RoleBasedRoute>
-                    } 
-                  />
-                ))}
-                <Route path="*" element={<Navigate to="/dashboard" replace />} />
-              </Routes>
+              <AppRoutes />
             </BrowserRouter>
           </TooltipProvider>
         </SupabaseAuthProvider>
