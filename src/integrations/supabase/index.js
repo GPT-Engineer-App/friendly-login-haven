@@ -30,7 +30,6 @@ export const useSupabaseAuth = () => {
 
   return { session };
 };
-}
 
 const fromSupabase = async (query) => {
     const { data, error } = await query;
