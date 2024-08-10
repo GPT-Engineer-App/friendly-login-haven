@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from '@/integrations/supabase';
 import { useNavigate } from 'react-router-dom';
-import { SupabaseAuthUI } from '@/integrations/supabase/auth';
+import { Auth } from '@supabase/auth-ui-react';
+import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const Index = () => {
@@ -58,7 +59,12 @@ const Index = () => {
             </Alert>
           )}
           <p className="text-center mb-4">Please log in to access the system</p>
-          <SupabaseAuthUI />
+          <Auth
+            supabaseClient={supabase}
+            appearance={{ theme: ThemeSupa }}
+            theme="default"
+            providers={[]}
+          />
         </CardContent>
       </Card>
     </div>
