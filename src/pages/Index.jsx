@@ -19,6 +19,18 @@ const Index = () => {
     e.preventDefault();
     setError('');
     try {
+      // First, check if the email exists in the hrms_users table
+      const { data: hrmsUser, error: hrmsError } = await supabase
+        .from('hrms_users')
+        .select('email')
+        .eq('email', email)
+        .single();
+
+      if (hrmsError || !hrmsUser) {
+        throw new Error('Invalid email or password');
+      }
+
+      // If the email exists, attempt to sign in
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email,
         password: password,
@@ -33,6 +45,7 @@ const Index = () => {
     }
   };
 
+  const { user } = useAuth();
   if (user) {
     navigate('/dashboard');
     return null;
