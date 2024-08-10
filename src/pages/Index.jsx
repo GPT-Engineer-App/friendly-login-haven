@@ -2,15 +2,25 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { supabase } from '@/integrations/supabase';
+import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login submitted:', { email, password });
-    // Here you would typically handle the login logic
+    setError(null);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      navigate('/dashboard'); // Redirect to dashboard after successful login
+    } catch (error) {
+      setError(error.message);
+    }
   };
 
   return (
@@ -43,8 +53,17 @@ const Index = () => {
                 required
               />
             </div>
+            {error && <p className="text-red-500 text-sm">{error}</p>}
             <Button type="submit" className="w-full">Log In</Button>
           </form>
+          <div className="mt-4 text-center">
+            <p className="text-sm text-gray-600">
+              Don't have an account?{' '}
+              <a href="/signup" className="text-blue-500 hover:underline">
+                Sign up
+              </a>
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>
