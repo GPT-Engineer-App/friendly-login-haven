@@ -7,6 +7,7 @@ import { navItems } from "./nav-items";
 import { SupabaseAuthProvider } from '@/integrations/supabase/auth';
 import RoleBasedRoute from './components/RoleBasedRoute';
 import Index from './pages/Index';
+import Unauthorized from './pages/Unauthorized';
 
 const queryClient = new QueryClient();
 
@@ -20,6 +21,7 @@ const App = () => {
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Index />} />
+                <Route path="/unauthorized" element={<Unauthorized />} />
                 {navItems.map(({ to, page, roles }) => (
                   <Route 
                     key={to} 
@@ -31,6 +33,7 @@ const App = () => {
                     } 
                   />
                 ))}
+                <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </BrowserRouter>
           </TooltipProvider>

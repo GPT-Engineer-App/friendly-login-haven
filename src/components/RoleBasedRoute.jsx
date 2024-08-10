@@ -15,7 +15,7 @@ const RoleBasedRoute = ({ children, roles }) => {
 
   const userRole = session.user.user_metadata.role;
 
-  if (!roles.includes(userRole)) {
+  if (roles && !roles.includes(userRole)) {
     return <Navigate to="/unauthorized" replace />;
   }
 
