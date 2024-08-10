@@ -1,14 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useSupabaseAuth } from '@/integrations/supabase/auth';
 
-const RoleBasedRoute = ({ children, roles }) => {
-  const { session, loading } = useSupabaseAuth();
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
+const RoleBasedRoute = ({ children, roles, session }) => {
   if (!session) {
     return <Navigate to="/" replace />;
   }

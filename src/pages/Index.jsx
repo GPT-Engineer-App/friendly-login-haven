@@ -5,23 +5,69 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from '@/integrations/supabase';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from "@/components/ui/use-toast";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
+      // First, check if the user exists in the hrms_users table
+      const { data: user, error: userError } = await supabase
+        .from('hrms_users')
+        .select('*')
+        .eq('email', email)
+        .single();
+
+      if (userError) throw userError;
+
+      if (!user) {
+        toast({
+          title: "Login Failed",
+          description: "User not found. Please check your email and try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Now, attempt to sign in with Supabase Auth
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
+
       if (error) throw error;
-      navigate('/unauthorized');
+
+      // If login is successful, navigate based on the user's role
+      switch (user.role) {
+        case 'admin':
+        case 'hr':
+          navigate('/dashboard');
+          break;
+        case 'manager':
+          navigate('/employee-management');
+          break;
+        case 'employee':
+          navigate('/attendance-tracking');
+          break;
+        default:
+          navigate('/unauthorized');
+      }
+
+      toast({
+        title: "Login Successful",
+        description: `Welcome, ${user.username}!`,
+      });
     } catch (error) {
-      alert(error.error_description || error.message);
+      toast({
+        title: "Login Failed",
+        description: error.message,
+        variant: "destructive",
+      });
     }
   };
 
