@@ -42,7 +42,6 @@ const AppRoutes = () => {
           <Dashboard />
         </RoleBasedRoute>
       } />
-      <Route path="/unauthorized" element={<Unauthorized />} />
       {navItems.map(({ to, page, roles }) => (
         <Route 
           key={to} 
