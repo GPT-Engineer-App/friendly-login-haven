@@ -1,53 +1,39 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { navItems } from "./nav-items";
-import { supabase } from '@/integrations/supabase';
+import { SupabaseAuthProvider } from '@/integrations/supabase/auth';
 import RoleBasedRoute from './components/RoleBasedRoute';
 
 const queryClient = new QueryClient();
 
 const App = () => {
-  const [session, setSession] = useState(null);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
   return (
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <BrowserRouter>
-            <Routes>
-              {navItems.map(({ to, page, roles }) => (
-                <Route 
-                  key={to} 
-                  path={to} 
-                  element={
-                    <RoleBasedRoute roles={roles}>
-                      {page}
-                    </RoleBasedRoute>
-                  } 
-                />
-              ))}
-              <Route path="/" element={session ? <Navigate to="/dashboard" replace /> : navItems[0].page} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
+        <SupabaseAuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <BrowserRouter>
+              <Routes>
+                {navItems.map(({ to, page, roles }) => (
+                  <Route 
+                    key={to} 
+                    path={to} 
+                    element={
+                      <RoleBasedRoute roles={roles}>
+                        {page}
+                      </RoleBasedRoute>
+                    } 
+                  />
+                ))}
+                <Route path="/" element={<Navigate to="/login" replace />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </SupabaseAuthProvider>
       </QueryClientProvider>
     </React.StrictMode>
   );
