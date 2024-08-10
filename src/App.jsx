@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { navItems } from "./nav-items";
 import { SupabaseAuthProvider } from '@/integrations/supabase/auth';
 import RoleBasedRoute from './components/RoleBasedRoute';
+import Index from './pages/Index';
 
 const queryClient = new QueryClient();
 
@@ -18,6 +19,7 @@ const App = () => {
             <Toaster />
             <BrowserRouter>
               <Routes>
+                <Route path="/" element={<Index />} />
                 {navItems.map(({ to, page, roles }) => (
                   <Route 
                     key={to} 
@@ -29,7 +31,6 @@ const App = () => {
                     } 
                   />
                 ))}
-                <Route path="/" element={<Navigate to="/login" replace />} />
               </Routes>
             </BrowserRouter>
           </TooltipProvider>
