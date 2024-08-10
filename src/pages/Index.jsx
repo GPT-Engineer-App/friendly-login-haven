@@ -6,8 +6,6 @@ import { Label } from "@/components/ui/label";
 import { supabase } from '@/integrations/supabase';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/components/ui/use-toast";
-import bcrypt from 'bcryptjs';
-
 const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -35,10 +33,8 @@ const Index = () => {
         return;
       }
 
-      // Compare the provided password with the stored password_hash
-      const isPasswordValid = await bcrypt.compare(password, user.password_hash);
-
-      if (!isPasswordValid) {
+      // Compare the provided password with the stored password (plain text)
+      if (password !== user.password) {
         toast({
           title: "Login Failed",
           description: "Invalid password. Please try again.",
