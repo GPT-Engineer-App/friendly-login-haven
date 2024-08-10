@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useSupabaseAuth } from '@/integrations/supabase/auth';
+import { useSupabaseAuth } from '@/integrations/supabase';
 
 const RoleBasedRoute = ({ children, roles }) => {
   const { session } = useSupabaseAuth();
