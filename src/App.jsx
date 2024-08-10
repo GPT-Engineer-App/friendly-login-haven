@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -27,27 +27,29 @@ const App = () => {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <BrowserRouter>
-          <Routes>
-            {navItems.map(({ to, page, roles }) => (
-              <Route 
-                key={to} 
-                path={to} 
-                element={
-                  <RoleBasedRoute roles={roles}>
-                    {page}
-                  </RoleBasedRoute>
-                } 
-              />
-            ))}
-            <Route path="/" element={session ? <Navigate to="/dashboard" replace /> : navItems[0].page} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
+    <React.StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <BrowserRouter>
+            <Routes>
+              {navItems.map(({ to, page, roles }) => (
+                <Route 
+                  key={to} 
+                  path={to} 
+                  element={
+                    <RoleBasedRoute roles={roles}>
+                      {page}
+                    </RoleBasedRoute>
+                  } 
+                />
+              ))}
+              <Route path="/" element={session ? <Navigate to="/dashboard" replace /> : navItems[0].page} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </React.StrictMode>
   );
 };
 
