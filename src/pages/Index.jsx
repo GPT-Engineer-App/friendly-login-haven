@@ -7,8 +7,6 @@ import { Label } from "@/components/ui/label";
 import { Users, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase';
-import bcrypt from 'bcryptjs';
-
 const Index = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -25,7 +23,7 @@ const Index = () => {
   const navigateBasedOnRole = (role) => {
     if (role === 'admin') {
       navigate('/admin-dashboard');
-    } else if (role === 'user') {
+    } else {
       navigate('/user-dashboard');
     }
   };
@@ -36,7 +34,7 @@ const Index = () => {
     try {
       const { data: userData, error: userError } = await supabase
         .from('users')
-        .select('user_id, email, password_hash, role, status')
+        .select('user_id, email, password, role, status')
         .eq('email', email)
         .single();
 
@@ -44,8 +42,7 @@ const Index = () => {
         throw new Error('User not found');
       }
 
-      const passwordMatch = await bcrypt.compare(password, userData.password_hash);
-      if (!passwordMatch) {
+      if (userData.password !== password) {
         throw new Error('Invalid password');
       }
 
