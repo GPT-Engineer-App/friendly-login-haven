@@ -94,16 +94,16 @@ const CreateUser = () => {
                         <SelectValue placeholder="Select an employee" />
                       </SelectTrigger>
                       <SelectContent>
-                        {isLoadingEmployees && <SelectItem value="">Loading employees...</SelectItem>}
-                        {isEmployeesError && <SelectItem value="">Error loading employees</SelectItem>}
+                        {isLoadingEmployees && <SelectItem value="loading">Loading employees...</SelectItem>}
+                        {isEmployeesError && <SelectItem value="error">Error loading employees</SelectItem>}
                         {employees && employees.length > 0 ? (
                           employees.map((employee) => (
-                            <SelectItem key={employee.id} value={employee.id?.toString() || ''}>
+                            <SelectItem key={employee.id} value={employee.id?.toString() || employee.emp_id}>
                               {employee.name} ({employee.emp_id})
                             </SelectItem>
                           ))
                         ) : (
-                          <SelectItem value="">No employees available</SelectItem>
+                          <SelectItem value="none">No employees available</SelectItem>
                         )}
                       </SelectContent>
                     </Select>
