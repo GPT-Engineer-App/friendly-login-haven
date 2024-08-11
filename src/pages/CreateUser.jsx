@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import Sidebar from '@/components/Sidebar';
 import { useCreateUser } from '@/hooks/useUsers';
 import { useToast } from "@/components/ui/use-toast";
+import { useEmployees } from '@/hooks/useEmployees';
 
 const CreateUser = () => {
   const [userData, setUserData] = useState({
@@ -17,6 +18,7 @@ const CreateUser = () => {
     role: '',
     emp_id: '',
   });
+  const { data: employees, isLoading: isLoadingEmployees } = useEmployees();
   const createUser = useCreateUser();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -86,8 +88,19 @@ const CreateUser = () => {
                     </Select>
                   </div>
                   <div>
-                    <Label htmlFor="emp_id">Employee ID (optional)</Label>
-                    <Input id="emp_id" name="emp_id" value={userData.emp_id} onChange={handleChange} />
+                    <Label htmlFor="emp_id">Employee</Label>
+                    <Select onValueChange={(value) => setUserData(prev => ({ ...prev, emp_id: value }))} required>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select an employee" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {employees?.map((employee) => (
+                          <SelectItem key={employee.id} value={employee.id.toString()}>
+                            {employee.name} ({employee.emp_id})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <Button type="submit" disabled={createUser.isLoading}>
                     {createUser.isLoading ? 'Creating...' : 'Create User'}

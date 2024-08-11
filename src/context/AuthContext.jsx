@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
             const { data: empData, error: empError } = await supabase
               .from('employees')
               .select('*')
-              .eq('emp_id', userData.emp_id)
+              .eq('id', userData.emp_id)
               .single();
 
             if (!empError) {

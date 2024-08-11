@@ -21,8 +21,8 @@ export const useCreateUser = () => {
           username: userData.username,
           email: userData.email,
           role: userData.role,
-          emp_id: userData.emp_id || null,
-          created_by: queryClient.getQueryData(['user'])?.id, // Assuming we store the current user in the query cache
+          emp_id: userData.emp_id,
+          created_by: queryClient.getQueryData(['user'])?.id,
         }])
         .select();
 
@@ -32,10 +32,26 @@ export const useCreateUser = () => {
         throw new Error(error.message);
       }
 
+      // Update the employee record with the new user_id
+      if (userData.emp_id) {
+        const { error: empError } = await supabase
+          .from('employees')
+          .update({ user_id: authUser.user.id })
+          .eq('id', userData.emp_id);
+
+        if (empError) {
+          // If there's an error, we should delete the auth user and the user record
+          await supabase.auth.admin.deleteUser(authUser.user.id);
+          await supabase.from('users').delete().eq('user_id', authUser.user.id);
+          throw new Error(empError.message);
+        }
+      }
+
       return data[0];
     },
     onSuccess: () => {
       queryClient.invalidateQueries('users');
+      queryClient.invalidateQueries('employees');
     },
   });
 };
