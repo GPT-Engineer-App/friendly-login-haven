@@ -11,7 +11,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import UserDashboard from './pages/UserDashboard';
 import EmployeeList from './pages/EmployeeList';
 import AddEmployee from '@/pages/AddEmployee';
-import EditEmployee from './pages/EditEmployee';
+import EditEmployee from './pages/EditEmployee.jsx';
 import EmployeeProfile from './pages/EmployeeProfile';
 import SearchEmployees from './pages/SearchEmployees';
 import { AuthProvider } from '@/context/AuthContext';
