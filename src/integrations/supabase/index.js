@@ -19,53 +19,60 @@ const fromSupabase = async (query) => {
 
 /* supabase integration types
 
-// EXAMPLE TYPES SECTION
-// DO NOT USE TYPESCRIPT
+### users
 
-### foos
+| name             | type                        | format                    | required |
+|------------------|-----------------------------|-----------------------|----------|
+| user_id          | uuid                        | string                | true     |
+| username         | character varying           | string (max 50 chars) | true     |
+| password_hash    | character varying           | string (max 255 chars)| true     |
+| role             | public.user_role_enum       | string (admin/user)   | true     |
+| email            | character varying           | string (max 100 chars)| true     |
+| created_at       | timestamp with time zone    | string                | false    |
+| created_by       | uuid                        | string                | false    |
+| last_updated_at  | timestamp with time zone    | string                | false    |
+| last_updated_by  | uuid                        | string                | false    |
 
-| name    | type | format | required |
-|---------|------|--------|----------|
-| id      | int8 | number | true     |
-| title   | text | string | true     |
-| date    | date | string | true     |
-
-### bars
-
-| name    | type | format | required |
-|---------|------|--------|----------|
-| id      | int8 | number | true     |
-| foo_id  | int8 | number | true     |  // foreign key to foos
-	
 */
 
-// Example hook for models
+// Hooks for users table
+export const useUsers = () => useQuery({
+    queryKey: ['users'],
+    queryFn: () => fromSupabase(supabase.from('users').select('*')),
+});
 
-export const useFoo = ()=> useQuery({
-    queryKey: ['foos'],
-    queryFn: fromSupabase(supabase.from('foos')),
-})
-export const useAddFoo = () => {
+export const useUser = (userId) => useQuery({
+    queryKey: ['users', userId],
+    queryFn: () => fromSupabase(supabase.from('users').select('*').eq('user_id', userId).single()),
+    enabled: !!userId,
+});
+
+export const useAddUser = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (newFoo)=> fromSupabase(supabase.from('foos').insert([{ title: newFoo.title }])),
-        onSuccess: ()=> {
-            queryClient.invalidateQueries('foos');
+        mutationFn: (newUser) => fromSupabase(supabase.from('users').insert([newUser])),
+        onSuccess: () => {
+            queryClient.invalidateQueries('users');
         },
     });
 };
 
-export const useBar = ()=> useQuery({
-    queryKey: ['bars'],
-    queryFn: fromSupabase(supabase.from('bars')),
-})
-export const useAddBar = () => {
+export const useUpdateUser = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (newBar)=> fromSupabase(supabase.from('bars').insert([{ foo_id: newBar.foo_id }])),
-        onSuccess: ()=> {
-            queryClient.invalidateQueries('bars');
+        mutationFn: ({ userId, updates }) => fromSupabase(supabase.from('users').update(updates).eq('user_id', userId)),
+        onSuccess: () => {
+            queryClient.invalidateQueries('users');
         },
     });
 };
 
+export const useDeleteUser = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (userId) => fromSupabase(supabase.from('users').delete().eq('user_id', userId)),
+        onSuccess: () => {
+            queryClient.invalidateQueries('users');
+        },
+    });
+};
