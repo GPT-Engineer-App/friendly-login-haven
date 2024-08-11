@@ -8,8 +8,10 @@ import Sidebar from '@/components/Sidebar';
 import { useAddEmployee } from '@/hooks/useEmployees';
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
 
 const AddEmployee = () => {
+  const { user } = useAuth();
   const [employeeData, setEmployeeData] = useState({
     emp_id: '',
     name: '',
@@ -20,7 +22,8 @@ const AddEmployee = () => {
     address: '',
     dob: '',
     emergency_contact_no: '',
-    created_by: user.email, // Assuming you have access to the current user
+    created_by: user?.email,
+    created_dt: new Date().toISOString(),
   });
 
   const addEmployee = useAddEmployee();
@@ -35,7 +38,12 @@ const AddEmployee = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await addEmployee.mutateAsync(employeeData);
+      const dataToSubmit = {
+        ...employeeData,
+        created_by: user?.email,
+        created_dt: new Date().toISOString(),
+      };
+      await addEmployee.mutateAsync(dataToSubmit);
       toast({
         title: "Success",
         description: "Employee added successfully",

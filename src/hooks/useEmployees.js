@@ -39,7 +39,10 @@ export const useAddEmployee = () => {
     mutationFn: async (newEmployee) => {
       const { data, error } = await supabase
         .from('employees')
-        .insert([newEmployee])
+        .insert([{
+          ...newEmployee,
+          created_dt: new Date().toISOString(),
+        }])
         .select();
       if (error) {
         console.error('Supabase error:', error);
