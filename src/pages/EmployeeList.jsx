@@ -3,7 +3,7 @@ import { useEmployees } from '@/hooks/useEmployees';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, Search } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import { useNavigate } from 'react-router-dom';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
@@ -29,7 +29,8 @@ const EmployeeList = () => {
 
   const filteredEmployees = employees?.filter(employee =>
     employee.emp_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    employee.email.toLowerCase().includes(searchTerm.toLowerCase())
+    employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    employee.name.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
   const sortedEmployees = [...filteredEmployees].sort((a, b) => {
@@ -55,14 +56,18 @@ const EmployeeList = () => {
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
           <div className="container mx-auto px-6 py-8">
             <h1 className="text-3xl font-semibold text-gray-800 mb-6">Employee List</h1>
-            <div className="mb-4">
-              <Input
-                type="text"
-                placeholder="Search by Employee ID or Email"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="max-w-sm"
-              />
+            <div className="mb-4 flex items-center">
+              <div className="relative flex-grow max-w-sm">
+                <Input
+                  type="text"
+                  placeholder="Search by Name, ID, or Email"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              </div>
+              <Button className="ml-2" onClick={() => navigate('/add-employee')}>Add Employee</Button>
             </div>
             <Table>
               <TableHeader>
