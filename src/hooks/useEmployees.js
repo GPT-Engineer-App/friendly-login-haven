@@ -1,10 +1,17 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase';
+import { useAuth } from '@/context/AuthContext';
 
 export const useEmployees = () => {
+  const { user } = useAuth();
+
   return useQuery({
     queryKey: ['employees'],
     queryFn: async () => {
+      if (user?.role !== 'admin') {
+        throw new Error('Unauthorized access');
+      }
+
       const { data, error } = await supabase
         .from('employees')
         .select('*');
@@ -14,6 +21,7 @@ export const useEmployees = () => {
       }
       return data;
     },
+    enabled: !!user && user.role === 'admin',
   });
 };
 

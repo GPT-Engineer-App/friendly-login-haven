@@ -34,7 +34,7 @@ const Index = () => {
     try {
       const { data: userData, error: userError } = await supabase
         .from('users')
-        .select('user_id, email, password, role, status')
+        .select('user_id, email, password, role, status, emp_id')
         .eq('email', email)
         .single();
 
@@ -50,7 +50,29 @@ const Index = () => {
         throw new Error(`Your account is ${userData.status}. Please contact the administrator.`);
       }
 
-      await login({ id: userData.user_id, email: userData.email, role: userData.role, status: userData.status });
+      let employeeData = null;
+      if (userData.emp_id) {
+        const { data: empData, error: empError } = await supabase
+          .from('employees')
+          .select('*')
+          .eq('emp_id', userData.emp_id)
+          .single();
+
+        if (empError) {
+          console.error('Error fetching employee data:', empError);
+        } else {
+          employeeData = empData;
+        }
+      }
+
+      await login({ 
+        id: userData.user_id, 
+        email: userData.email, 
+        role: userData.role, 
+        status: userData.status,
+        emp_id: userData.emp_id,
+        employeeData: employeeData
+      });
       navigateBasedOnRole(userData.role);
     } catch (error) {
       setError(error.message);

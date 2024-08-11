@@ -11,12 +11,31 @@ export const AuthProvider = ({ children }) => {
       if (session) {
         const { data: userData, error } = await supabase
           .from('users')
-          .select('role, status')
+          .select('role, status, emp_id')
           .eq('user_id', session.user.id)
           .single();
 
         if (!error && userData) {
-          setUser({ ...session.user, role: userData.role, status: userData.status });
+          let employeeData = null;
+          if (userData.emp_id) {
+            const { data: empData, error: empError } = await supabase
+              .from('employees')
+              .select('*')
+              .eq('emp_id', userData.emp_id)
+              .single();
+
+            if (!empError) {
+              employeeData = empData;
+            }
+          }
+
+          setUser({ 
+            ...session.user, 
+            role: userData.role, 
+            status: userData.status, 
+            emp_id: userData.emp_id,
+            employeeData: employeeData
+          });
         } else {
           setUser(null);
         }
