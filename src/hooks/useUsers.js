@@ -7,10 +7,27 @@ export const useUsers = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('users')
-        .select('*');
+        .select('*')
+        .order('created_at', { ascending: false });
       if (error) throw new Error(error.message);
       return data;
     },
+  });
+};
+
+export const useUser = (id) => {
+  return useQuery({
+    queryKey: ['user', id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('user_id', id)
+        .single();
+      if (error) throw new Error(error.message);
+      return data;
+    },
+    enabled: !!id,
   });
 };
 
@@ -34,6 +51,7 @@ export const useCreateUser = () => {
           username: userData.username,
           email: userData.email,
           role: userData.role,
+          status: userData.status,
           emp_id: userData.emp_id,
           created_by: queryClient.getQueryData(['user'])?.id,
         }])
@@ -45,7 +63,7 @@ export const useCreateUser = () => {
         throw new Error(error.message);
       }
 
-      // Update the employee record with the new user_id
+      // Update the employee record with the new user_id if applicable
       if (userData.emp_id) {
         const { error: empError } = await supabase
           .from('employees')
@@ -65,6 +83,40 @@ export const useCreateUser = () => {
     onSuccess: () => {
       queryClient.invalidateQueries('users');
       queryClient.invalidateQueries('employees');
+    },
+  });
+};
+
+export const useUpdateUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...updates }) => {
+      const { data, error } = await supabase
+        .from('users')
+        .update(updates)
+        .eq('user_id', id)
+        .select();
+      if (error) throw new Error(error.message);
+      return data[0];
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries('users');
+    },
+  });
+};
+
+export const useDeleteUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id) => {
+      const { error } = await supabase
+        .from('users')
+        .delete()
+        .eq('user_id', id);
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries('users');
     },
   });
 };

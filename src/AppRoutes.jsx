@@ -12,6 +12,8 @@ import EmployeeProfile from './pages/EmployeeProfile.jsx';
 import SearchEmployees from '@/pages/SearchEmployees';
 import CreateUser from '@/pages/CreateUser';
 import UserManagement from '@/pages/UserManagement';
+import EditUser from '@/pages/EditUser';
+import UserDetails from '@/pages/UserDetails';
 import Reports from '@/pages/Reports';
 import Analytics from '@/pages/Analytics';
 
@@ -86,6 +88,16 @@ const AppRoutes = () => {
       <Route path="/user-management" element={
         <ProtectedRoute allowedRoles={['admin']}>
           <UserManagement />
+        </ProtectedRoute>
+      } />
+      <Route path="/edit-user/:id" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <EditUser />
+        </ProtectedRoute>
+      } />
+      <Route path="/user-details/:id" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <UserDetails />
         </ProtectedRoute>
       } />
       <Route path="/reports" element={
