@@ -4,12 +4,16 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from '@/context/AuthContext';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { navItems } from "./nav-items";
 import RoleBasedRoute from './components/RoleBasedRoute';
 import Index from './pages/Index';
 import Unauthorized from '@/pages/Unauthorized';
 import AdminDashboard from './pages/AdminDashboard';
 import UserDashboard from './pages/UserDashboard';
+import EmployeeList from './pages/EmployeeList';
+import AddEmployee from './pages/AddEmployee';
+import EditEmployee from './pages/EditEmployee';
+import EmployeeProfile from './pages/EmployeeProfile';
+import SearchEmployees from './pages/SearchEmployees';
 import { AuthProvider } from '@/context/AuthContext';
 
 const queryClient = new QueryClient();
@@ -41,17 +45,31 @@ const AppRoutes = () => {
           <UserDashboard />
         </ProtectedRoute>
       } />
-      {navItems.map(({ to, page, roles }) => (
-        <Route 
-          key={to} 
-          path={to} 
-          element={
-            <ProtectedRoute allowedRoles={roles}>
-              {page}
-            </ProtectedRoute>
-          } 
-        />
-      ))}
+      <Route path="/employee-list" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <EmployeeList />
+        </ProtectedRoute>
+      } />
+      <Route path="/add-employee" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <AddEmployee />
+        </ProtectedRoute>
+      } />
+      <Route path="/edit-employee/:id" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <EditEmployee />
+        </ProtectedRoute>
+      } />
+      <Route path="/employee-profile/:id" element={
+        <ProtectedRoute allowedRoles={['admin', 'user']}>
+          <EmployeeProfile />
+        </ProtectedRoute>
+      } />
+      <Route path="/search" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <SearchEmployees />
+        </ProtectedRoute>
+      } />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
