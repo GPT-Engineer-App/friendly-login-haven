@@ -55,3 +55,27 @@ export const useAddEmployee = () => {
     },
   });
 };
+
+export const useUpdateEmployee = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...updates }) => {
+      const { data, error } = await supabase
+        .from('employees')
+        .update({
+          ...updates,
+          last_upd: new Date().toISOString(),
+        })
+        .eq('user_id', id)
+        .select();
+      if (error) {
+        console.error('Supabase error:', error);
+        throw new Error(error.message);
+      }
+      return data[0];
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries('employees');
+    },
+  });
+};
