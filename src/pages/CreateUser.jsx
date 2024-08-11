@@ -18,7 +18,7 @@ const CreateUser = () => {
     role: '',
     emp_id: '',
   });
-  const { data: employees, isLoading: isLoadingEmployees } = useEmployees();
+  const { data: employees, isLoading: isLoadingEmployees, isError: isEmployeesError } = useEmployees();
   const createUser = useCreateUser();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -94,11 +94,17 @@ const CreateUser = () => {
                         <SelectValue placeholder="Select an employee" />
                       </SelectTrigger>
                       <SelectContent>
-                        {employees?.map((employee) => (
-                          <SelectItem key={employee.id} value={employee.id.toString()}>
-                            {employee.name} ({employee.emp_id})
-                          </SelectItem>
-                        ))}
+                        {isLoadingEmployees && <SelectItem value="">Loading employees...</SelectItem>}
+                        {isEmployeesError && <SelectItem value="">Error loading employees</SelectItem>}
+                        {employees && employees.length > 0 ? (
+                          employees.map((employee) => (
+                            <SelectItem key={employee.id} value={employee.id?.toString() || ''}>
+                              {employee.name} ({employee.emp_id})
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem value="">No employees available</SelectItem>
+                        )}
                       </SelectContent>
                     </Select>
                   </div>
