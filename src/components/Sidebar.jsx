@@ -7,8 +7,7 @@ const Sidebar = () => {
     { icon: Home, label: 'Dashboard', to: '/admin-dashboard' },
     { icon: Users, label: 'Employee List', to: '/employee-list' },
     { icon: UserPlus, label: 'Add Employee', to: '/add-employee' },
-    { icon: Search, label: 'Search', to: '/search' },
-    { icon: UserCog, label: 'Create User', to: '/create-user' },
+    { icon: UserCog, label: 'User Management', to: '/user-management' },
   ];
 
   return (
