@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,24 +13,40 @@ const Index = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { user, login } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      navigateBasedOnRole(user.role);
+    }
+  }, [user]);
+
+  const navigateBasedOnRole = (role) => {
+    if (role === 'admin') {
+      navigate('/admin-dashboard');
+    } else if (role === 'user') {
+      navigate('/user-dashboard');
+    }
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
     try {
-      // First, check if the email exists in the hrms_users table
-      const { data: hrmsUser, error: hrmsError } = await supabase
-        .from('hrms_users')
-        .select('email')
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('*')
         .eq('email', email)
         .single();
 
-      if (hrmsError || !hrmsUser) {
+      if (userError || !userData) {
         throw new Error('Invalid email or password');
       }
 
-      // If the email exists, attempt to sign in
+      if (userData.status !== 'active') {
+        throw new Error(`Your account is ${userData.status}. Please contact the administrator.`);
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email,
         password: password,
@@ -38,17 +54,15 @@ const Index = () => {
 
       if (error) throw error;
 
-      await login(data.user);
-      navigate('/dashboard');
+      await login({ ...data.user, role: userData.role });
+      navigateBasedOnRole(userData.role);
     } catch (error) {
       setError(error.message);
     }
   };
 
-  const { user } = useAuth();
   if (user) {
-    navigate('/dashboard');
-    return null;
+    return null; // or a loading spinner
   }
 
   return (

@@ -9,7 +9,17 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session) {
-        setUser(session.user);
+        const { data: userData, error } = await supabase
+          .from('users')
+          .select('role, status')
+          .eq('user_id', session.user.id)
+          .single();
+
+        if (!error && userData) {
+          setUser({ ...session.user, role: userData.role, status: userData.status });
+        } else {
+          setUser(null);
+        }
       } else {
         setUser(null);
       }

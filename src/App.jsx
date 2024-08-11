@@ -8,30 +8,47 @@ import { navItems } from "./nav-items";
 import RoleBasedRoute from './components/RoleBasedRoute';
 import Index from './pages/Index';
 import Unauthorized from '@/pages/Unauthorized';
-import Dashboard from './pages/Dashboard';
+import AdminDashboard from './pages/AdminDashboard';
+import UserDashboard from './pages/UserDashboard';
 import { AuthProvider } from '@/context/AuthContext';
 
 const queryClient = new QueryClient();
+
+const ProtectedRoute = ({ children, allowedRoles }) => {
+  const { user } = useAuth();
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+  return children;
+};
 
 const AppRoutes = () => {
   const { user } = useAuth();
 
   return (
     <Routes>
-      <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <Index />} />
-      <Route path="/dashboard" element={
-        <RoleBasedRoute roles={['admin', 'manager', 'employee', 'hr']}>
-          <Dashboard />
-        </RoleBasedRoute>
+      <Route path="/" element={user ? <Navigate to={user.role === 'admin' ? "/admin-dashboard" : "/user-dashboard"} replace /> : <Index />} />
+      <Route path="/admin-dashboard" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <AdminDashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="/user-dashboard" element={
+        <ProtectedRoute allowedRoles={['user']}>
+          <UserDashboard />
+        </ProtectedRoute>
       } />
       {navItems.map(({ to, page, roles }) => (
         <Route 
           key={to} 
           path={to} 
           element={
-            <RoleBasedRoute roles={roles}>
+            <ProtectedRoute allowedRoles={roles}>
               {page}
-            </RoleBasedRoute>
+            </ProtectedRoute>
           } 
         />
       ))}
