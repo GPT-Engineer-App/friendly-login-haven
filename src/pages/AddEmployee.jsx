@@ -20,6 +20,7 @@ const AddEmployee = () => {
     address: '',
     dob: '',
     emergency_contact_no: '',
+    created_by: user.email, // Assuming you have access to the current user
   });
 
   const addEmployee = useAddEmployee();
@@ -99,7 +100,9 @@ const AddEmployee = () => {
                     <Label htmlFor="emergency_contact_no">Emergency Contact Number</Label>
                     <Input id="emergency_contact_no" name="emergency_contact_no" value={employeeData.emergency_contact_no} onChange={handleChange} placeholder="Enter emergency contact number" />
                   </div>
-                  <Button type="submit">Add Employee</Button>
+                  <Button type="submit" disabled={addEmployee.isLoading}>
+                    {addEmployee.isLoading ? 'Adding...' : 'Add Employee'}
+                  </Button>
                 </form>
               </CardContent>
             </Card>

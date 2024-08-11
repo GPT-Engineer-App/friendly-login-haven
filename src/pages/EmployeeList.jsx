@@ -93,6 +93,7 @@ const EmployeeList = () => {
                     <TableCell>{employee.designation}</TableCell>
                     <TableCell>{employee.email}</TableCell>
                     <TableCell>{employee.phone_no}</TableCell>
+                    <TableCell>{new Date(employee.date_of_joining).toLocaleDateString()}</TableCell>
                     <TableCell>
                       <Button variant="ghost" size="icon" onClick={() => navigate(`/edit-employee/${employee.user_id}`)}>
                         <Edit className="h-4 w-4" />
