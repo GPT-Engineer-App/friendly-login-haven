@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase';
 
 export const useEmployees = () => {
@@ -27,5 +27,22 @@ export const useEmployee = (id) => {
       return data;
     },
     enabled: !!id,
+  });
+};
+
+export const useAddEmployee = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (newEmployee) => {
+      const { data, error } = await supabase
+        .from('employees')
+        .insert([newEmployee])
+        .select();
+      if (error) throw new Error(error.message);
+      return data[0];
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries('employees');
+    },
   });
 };
