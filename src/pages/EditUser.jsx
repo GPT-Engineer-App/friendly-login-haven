@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Sidebar from '@/components/Sidebar';
 import { useUser, useUpdateUser } from '@/hooks/useUsers';
 import { useToast } from "@/components/ui/use-toast";
@@ -15,25 +15,23 @@ const EditUser = () => {
   const { data: user, isLoading, isError } = useUser(id);
   const updateUser = useUpdateUser();
   const { toast } = useToast();
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    role: '',
-    status: '',
-    password: '',
-  });
+  const [formData, setFormData] = useState(null);
 
   useEffect(() => {
     if (user) {
       setFormData({
-        username: user.username,
-        email: user.email,
-        role: user.role,
-        status: user.status,
+        username: user.username || '',
+        email: user.email || '',
+        role: user.role || '',
+        status: user.status || '',
         password: '',
       });
     }
   }, [user]);
+
+  if (!formData) {
+    return <div>Loading user data...</div>;
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -84,16 +82,26 @@ const EditUser = () => {
                   </div>
                   <div>
                     <Label htmlFor="role">Role</Label>
-                    <Select id="role" name="role" value={formData.role} onChange={handleChange} required>
-                      <option value="admin">Admin</option>
-                      <option value="user">User</option>
+                    <Select name="role" value={formData.role} onValueChange={(value) => handleChange({ target: { name: 'role', value } })} required>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select role" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="admin">Admin</SelectItem>
+                        <SelectItem value="user">User</SelectItem>
+                      </SelectContent>
                     </Select>
                   </div>
                   <div>
                     <Label htmlFor="status">Status</Label>
-                    <Select id="status" name="status" value={formData.status} onChange={handleChange} required>
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
+                    <Select name="status" value={formData.status} onValueChange={(value) => handleChange({ target: { name: 'status', value } })} required>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="inactive">Inactive</SelectItem>
+                      </SelectContent>
                     </Select>
                   </div>
                   <div>
