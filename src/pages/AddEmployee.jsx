@@ -22,8 +22,7 @@ const AddEmployee = () => {
     address: '',
     dob: '',
     emergency_contact_no: '',
-    created_by: user?.email,
-    created_dt: new Date().toISOString(),
+    created_by: user?.email || '',
   });
 
   const addEmployee = useAddEmployee();
@@ -38,12 +37,7 @@ const AddEmployee = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const dataToSubmit = {
-        ...employeeData,
-        created_by: user?.email,
-        created_dt: new Date().toISOString(),
-      };
-      await addEmployee.mutateAsync(dataToSubmit);
+      await addEmployee.mutateAsync(employeeData);
       toast({
         title: "Success",
         description: "Employee added successfully",
