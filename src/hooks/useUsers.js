@@ -1,5 +1,18 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase';
+
+export const useUsers = () => {
+  return useQuery({
+    queryKey: ['users'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*');
+      if (error) throw new Error(error.message);
+      return data;
+    },
+  });
+};
 
 export const useCreateUser = () => {
   const queryClient = useQueryClient();
