@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import Sidebar from '@/components/Sidebar';
 import { useAddEmployee } from '@/hooks/useEmployees';
 import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from 'react-router-dom';
 
 const AddEmployee = () => {
   const [employeeData, setEmployeeData] = useState({
@@ -23,6 +24,7 @@ const AddEmployee = () => {
 
   const addEmployee = useAddEmployee();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -37,11 +39,12 @@ const AddEmployee = () => {
         title: "Success",
         description: "Employee added successfully",
       });
-      // Reset form or redirect
+      navigate('/employee-list'); // Redirect to employee list after successful addition
     } catch (error) {
+      console.error('Error adding employee:', error);
       toast({
         title: "Error",
-        description: "Failed to add employee",
+        description: error.message || "Failed to add employee",
         variant: "destructive",
       });
     }

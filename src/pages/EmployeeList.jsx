@@ -67,11 +67,21 @@ const EmployeeList = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead onClick={() => handleSort('emp_id')} className="cursor-pointer">Employee ID</TableHead>
-                  <TableHead onClick={() => handleSort('name')} className="cursor-pointer">Name</TableHead>
-                  <TableHead onClick={() => handleSort('designation')} className="cursor-pointer">Designation</TableHead>
-                  <TableHead onClick={() => handleSort('email')} className="cursor-pointer">Email</TableHead>
-                  <TableHead onClick={() => handleSort('phone_no')} className="cursor-pointer">Phone Number</TableHead>
+                  <TableHead onClick={() => handleSort('emp_id')} className="cursor-pointer">
+                    <Button variant="ghost" className="p-0 font-semibold">Employee ID</Button>
+                  </TableHead>
+                  <TableHead onClick={() => handleSort('name')} className="cursor-pointer">
+                    <Button variant="ghost" className="p-0 font-semibold">Name</Button>
+                  </TableHead>
+                  <TableHead onClick={() => handleSort('designation')} className="cursor-pointer">
+                    <Button variant="ghost" className="p-0 font-semibold">Designation</Button>
+                  </TableHead>
+                  <TableHead onClick={() => handleSort('email')} className="cursor-pointer">
+                    <Button variant="ghost" className="p-0 font-semibold">Email</Button>
+                  </TableHead>
+                  <TableHead onClick={() => handleSort('phone_no')} className="cursor-pointer">
+                    <Button variant="ghost" className="p-0 font-semibold">Phone Number</Button>
+                  </TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>

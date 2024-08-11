@@ -6,9 +6,12 @@ export const useEmployees = () => {
     queryKey: ['employees'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('employees')
+        .from('hrms_employees')
         .select('*');
-      if (error) throw new Error(error.message);
+      if (error) {
+        console.error('Supabase error:', error);
+        throw new Error(error.message);
+      }
       return data;
     },
   });
@@ -35,10 +38,13 @@ export const useAddEmployee = () => {
   return useMutation({
     mutationFn: async (newEmployee) => {
       const { data, error } = await supabase
-        .from('employees')
+        .from('hrms_employees') // Updated table name
         .insert([newEmployee])
         .select();
-      if (error) throw new Error(error.message);
+      if (error) {
+        console.error('Supabase error:', error);
+        throw new Error(error.message);
+      }
       return data[0];
     },
     onSuccess: () => {
