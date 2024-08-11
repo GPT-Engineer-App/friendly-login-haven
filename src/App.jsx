@@ -10,7 +10,7 @@ import Unauthorized from '@/pages/Unauthorized';
 import AdminDashboard from './pages/AdminDashboard';
 import UserDashboard from './pages/UserDashboard';
 import EmployeeList from './pages/EmployeeList';
-import AddEmployee from './pages/AddEmployee';
+import AddEmployee from '@/pages/AddEmployee';
 import EditEmployee from './pages/EditEmployee';
 import EmployeeProfile from './pages/EmployeeProfile';
 import SearchEmployees from './pages/SearchEmployees';
