@@ -33,20 +33,6 @@ const Index = () => {
     e.preventDefault();
     setError('');
     try {
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('email', email)
-        .single();
-
-      if (userError || !userData) {
-        throw new Error('Invalid email or password');
-      }
-
-      if (userData.status !== 'active') {
-        throw new Error(`Your account is ${userData.status}. Please contact the administrator.`);
-      }
-
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email,
         password: password,
@@ -54,7 +40,21 @@ const Index = () => {
 
       if (error) throw error;
 
-      await login({ ...data.user, role: userData.role });
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('role, status')
+        .eq('user_id', data.user.id)
+        .single();
+
+      if (userError || !userData) {
+        throw new Error('User data not found');
+      }
+
+      if (userData.status !== 'active') {
+        throw new Error(`Your account is ${userData.status}. Please contact the administrator.`);
+      }
+
+      await login({ ...data.user, role: userData.role, status: userData.status });
       navigateBasedOnRole(userData.role);
     } catch (error) {
       setError(error.message);
