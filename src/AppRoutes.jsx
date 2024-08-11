@@ -11,6 +11,9 @@ import EditEmployee from './pages/EditEmployee.jsx';
 import EmployeeProfile from './pages/EmployeeProfile.jsx';
 import SearchEmployees from '@/pages/SearchEmployees';
 import CreateUser from '@/pages/CreateUser';
+import UserManagement from '@/pages/UserManagement';
+import Reports from '@/pages/Reports';
+import Analytics from '@/pages/Analytics';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -78,6 +81,21 @@ const AppRoutes = () => {
       <Route path="/create-user" element={
         <ProtectedRoute allowedRoles={['admin']}>
           <CreateUser />
+        </ProtectedRoute>
+      } />
+      <Route path="/user-management" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <UserManagement />
+        </ProtectedRoute>
+      } />
+      <Route path="/reports" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <Reports />
+        </ProtectedRoute>
+      } />
+      <Route path="/analytics" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <Analytics />
         </ProtectedRoute>
       } />
       <Route path="/unauthorized" element={<Unauthorized />} />
