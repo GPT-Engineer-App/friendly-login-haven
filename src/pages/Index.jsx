@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Users, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase';
+import bcrypt from 'bcryptjs';
 
 const Index = () => {
   const [email, setEmail] = useState('');
@@ -33,28 +34,26 @@ const Index = () => {
     e.preventDefault();
     setError('');
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password,
-      });
-
-      if (error) throw error;
-
       const { data: userData, error: userError } = await supabase
         .from('users')
-        .select('role, status')
-        .eq('user_id', data.user.id)
+        .select('user_id, email, password_hash, role, status')
+        .eq('email', email)
         .single();
 
       if (userError || !userData) {
-        throw new Error('User data not found');
+        throw new Error('User not found');
+      }
+
+      const passwordMatch = await bcrypt.compare(password, userData.password_hash);
+      if (!passwordMatch) {
+        throw new Error('Invalid password');
       }
 
       if (userData.status !== 'active') {
         throw new Error(`Your account is ${userData.status}. Please contact the administrator.`);
       }
 
-      await login({ ...data.user, role: userData.role, status: userData.status });
+      await login({ id: userData.user_id, email: userData.email, role: userData.role, status: userData.status });
       navigateBasedOnRole(userData.role);
     } catch (error) {
       setError(error.message);
