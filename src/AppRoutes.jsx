@@ -10,6 +10,7 @@ import AddEmployee from '@/pages/AddEmployee';
 import EditEmployee from './pages/EditEmployee.jsx';
 import EmployeeProfile from './pages/EmployeeProfile.jsx';
 import SearchEmployees from '@/pages/SearchEmployees';
+import CreateUser from '@/pages/CreateUser';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user } = useAuth();
@@ -61,6 +62,11 @@ const AppRoutes = () => {
       <Route path="/search" element={
         <ProtectedRoute allowedRoles={['admin']}>
           <SearchEmployees />
+        </ProtectedRoute>
+      } />
+      <Route path="/create-user" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <CreateUser />
         </ProtectedRoute>
       } />
       <Route path="/unauthorized" element={<Unauthorized />} />

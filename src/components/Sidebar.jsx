@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Users, UserPlus, Search, Home } from 'lucide-react';
+import { Users, UserPlus, Search, Home, UserCog } from 'lucide-react';
 
 const Sidebar = () => {
   const navItems = [
@@ -8,6 +8,7 @@ const Sidebar = () => {
     { icon: Users, label: 'Employee List', to: '/employee-list' },
     { icon: UserPlus, label: 'Add Employee', to: '/add-employee' },
     { icon: Search, label: 'Search', to: '/search' },
+    { icon: UserCog, label: 'Create User', to: '/create-user' },
   ];
 
   return (

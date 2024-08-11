@@ -3,7 +3,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Briefcase, Calendar } from 'lucide-react';
+import { Users, Briefcase, Calendar, UserPlus } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import { useEmployees } from '@/hooks/useEmployees';
 
@@ -19,6 +19,7 @@ const AdminDashboard = () => {
 
   const metrics = [
     { title: 'Total Employees', value: isLoading ? '...' : employees?.length || 0, icon: Users },
+    { title: 'Create User', value: 'New', icon: UserPlus, action: () => navigate('/create-user') },
   ];
 
   return (
@@ -36,7 +37,7 @@ const AdminDashboard = () => {
             <h2 className="text-3xl font-semibold text-gray-800 mb-6">Welcome, {user?.email}</h2>
             <div className="grid gap-6 mb-8 md:grid-cols-1">
               {metrics.map((item, index) => (
-                <Card key={index}>
+                <Card key={index} className={item.action ? 'cursor-pointer' : ''} onClick={item.action}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">{item.title}</CardTitle>
                     <item.icon className="h-4 w-4 text-muted-foreground" />
