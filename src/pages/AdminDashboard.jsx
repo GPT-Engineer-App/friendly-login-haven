@@ -19,8 +19,6 @@ const AdminDashboard = () => {
 
   const metrics = [
     { title: 'Total Employees', value: isLoading ? '...' : employees?.length || 0, icon: Users },
-    { title: 'Departments', value: 5, icon: Briefcase },
-    { title: 'New Hires (This Month)', value: 3, icon: Calendar },
   ];
 
   return (
@@ -36,7 +34,7 @@ const AdminDashboard = () => {
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
           <div className="container mx-auto px-6 py-8">
             <h2 className="text-3xl font-semibold text-gray-800 mb-6">Welcome, {user?.email}</h2>
-            <div className="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-6 mb-8 md:grid-cols-1">
               {metrics.map((item, index) => (
                 <Card key={index}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
