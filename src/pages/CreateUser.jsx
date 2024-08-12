@@ -35,6 +35,14 @@ const CreateUser = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Ensure all required fields are present
+      if (!userData.username || !userData.email || !userData.password || !userData.role) {
+        throw new Error("All fields are required");
+      }
+    
+      // Log the userData being sent (remove in production)
+      console.log("Sending user data:", userData);
+
       await createUser.mutateAsync(userData);
       toast({
         title: "Success",
