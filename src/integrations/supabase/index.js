@@ -11,6 +11,13 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
   }
 });
 
+export const supabaseAdmin = createClient(supabaseUrl, import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false
+  }
+});
+
 import React from "react";
 export const queryClient = new QueryClient();
 export function SupabaseProvider({ children }) {
