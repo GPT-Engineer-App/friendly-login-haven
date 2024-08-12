@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from '@/integrations/supabase';
 import { useAuth } from '@/context/AuthContext';
+import { v4 as uuidv4 } from 'uuid';
 
 const DocumentUpload = ({ adminMode = false }) => {
   const [file, setFile] = useState(null);
@@ -67,7 +68,7 @@ const DocumentUpload = ({ adminMode = false }) => {
   };
 
   const handleUpload = async () => {
-    if (!file || !documentType || !user?.employeeData?.emp_id) {
+    if (!file || !documentType || !user?.id) {
       toast({
         title: "Error",
         description: "Please select a file, document type, and ensure you're logged in",
@@ -78,37 +79,45 @@ const DocumentUpload = ({ adminMode = false }) => {
 
     setUploading(true);
     try {
+      const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser();
+      if (userError || !currentUser) {
+        throw new Error('User not authenticated');
+      }
+
+      console.log('User data:', currentUser);
+      console.log('Employee data:', user.employeeData);
+
       const fileExt = file.name.split('.').pop();
-      const fileName = `${documentType}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const fileName = `${documentType}_${uuidv4()}.${fileExt}`;
       const rootFolder = 'user_documents';
-      const folderName = user.employeeData.emp_id.replace(/\//g, '_') + '_kyc';
-      const filePath = `${rootFolder}/${folderName}/${fileName}`;
+      const folderName = `${currentUser.id}_kyc`;
+      const filePath = `${folderName}/${fileName}`;
       console.log('Uploading file to:', filePath);
 
       // Use RLS policy for storage
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from(rootFolder)
-        .upload(`${folderName}/${fileName}`, file, {
+        .upload(filePath, file, {
           cacheControl: '3600',
           upsert: false
         });
 
       if (uploadError) {
-        console.error('Upload error:', uploadError);
-        throw uploadError;
+        console.error('Upload error details:', uploadError);
+        throw new Error(`Upload failed: ${uploadError.message || uploadError.error_description || 'Unknown error'}`);
       }
 
       // Use RLS policy for database insertion
       const { data: insertData, error: insertError } = await supabase
         .from('documents')
         .insert({
-          user_id: user.id,
-          emp_id: user.employeeData.emp_id,
+          user_id: currentUser.id,
+          emp_id: user.employeeData?.emp_id,
           file_name: fileName,
-          file_path: `${folderName}/${fileName}`,
+          file_path: filePath,
           file_type: file.type,
           document_type: documentType,
-          uploaded_by: user.id,
+          uploaded_by: currentUser.id,
         })
         .select();
 
@@ -117,8 +126,8 @@ const DocumentUpload = ({ adminMode = false }) => {
         // If insert fails, remove the uploaded file
         await supabase.storage
           .from(rootFolder)
-          .remove([`${folderName}/${fileName}`]);
-        throw insertError;
+          .remove([filePath]);
+        throw new Error(`Failed to insert document record: ${insertError.message}`);
       }
 
       console.log('Inserted document record:', insertData);
