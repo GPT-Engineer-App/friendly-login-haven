@@ -61,17 +61,17 @@ export const useAddEmployee = () => {
           throw new Error(error.message);
         }
 
-        // Call the function to create the employee bucket and set up policies
-        const { error: bucketError } = await supabase.rpc('create_employee_bucket', {
+        // Call the function to create the employee folder and set up policies
+        const { error: folderError } = await supabase.rpc('create_employee_folder', {
           emp_id: data[0].emp_id,
           user_id: data[0].user_id
         });
 
-        if (bucketError) {
-          console.error('Error creating employee bucket:', bucketError);
+        if (folderError) {
+          console.error('Error creating employee folder:', folderError);
           // Don't throw an error here, just log it
         } else {
-          console.log('Employee bucket and policies created successfully');
+          console.log('Employee folder and policies created successfully');
         }
 
         return data[0];
