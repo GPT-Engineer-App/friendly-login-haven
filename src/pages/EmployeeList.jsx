@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useEmployees } from '@/hooks/useEmployees';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Edit, Trash2, Search } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
