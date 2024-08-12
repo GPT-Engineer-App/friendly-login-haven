@@ -9,6 +9,7 @@ import { useAuth } from '@/context/AuthContext';
 import { v4 as uuidv4 } from 'uuid';
 
 const DocumentUpload = ({ adminMode = false }) => {
+  const { user } = useAuth();
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [documentType, setDocumentType] = useState('');
@@ -90,7 +91,7 @@ const DocumentUpload = ({ adminMode = false }) => {
       const fileExt = file.name.split('.').pop();
       const fileName = `${documentType}_${uuidv4()}.${fileExt}`;
       const rootFolder = 'user_documents';
-      const folderName = `${currentUser.id}_kyc`;
+      const folderName = `${user.employeeData.emp_id.replace(/\//g, '_')}_kyc`;
       const filePath = `${folderName}/${fileName}`;
       console.log('Uploading file to:', filePath);
 
