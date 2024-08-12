@@ -50,8 +50,9 @@ const DocumentUpload = ({ userId, adminMode = false }) => {
       const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `${fileName}`;
 
+      const bucketName = `employee_${employeeId.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()}`;
       const { error: uploadError } = await supabase.storage
-        .from(`employee_${employeeId}`)
+        .from(bucketName)
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;

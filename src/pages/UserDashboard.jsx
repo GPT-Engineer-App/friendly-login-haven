@@ -47,8 +47,9 @@ const UserDashboard = () => {
 
   const handleDownload = async (document) => {
     try {
+      const bucketName = `employee_${user.employeeData.emp_id.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()}`;
       const { data, error } = await supabase.storage
-        .from(`employee_${user.employeeData.emp_id}`)
+        .from(bucketName)
         .download(document.file_path);
 
       if (error) throw error;
@@ -77,8 +78,9 @@ const UserDashboard = () => {
 
       if (deleteError) throw deleteError;
 
+      const bucketName = `employee_${user.employeeData.emp_id.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()}`;
       const { error: storageError } = await supabase.storage
-        .from(`employee_${user.employeeData.emp_id}`)
+        .from(bucketName)
         .remove([document.file_path]);
 
       if (storageError) throw storageError;

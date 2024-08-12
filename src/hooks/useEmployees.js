@@ -61,9 +61,10 @@ export const useAddEmployee = () => {
       }
 
       // Create a folder for the new employee
+      const bucketName = `employee_${data[0].emp_id.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()}`;
       const { error: storageError } = await supabase
         .storage
-        .createBucket(`employee_${data[0].emp_id}`, {
+        .createBucket(bucketName, {
           public: false,
           fileSizeLimit: 1024 * 1024 * 10, // 10MB
         });
