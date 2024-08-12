@@ -15,6 +15,7 @@ import EditUser from '@/pages/EditUser';
 import UserDetails from '@/pages/UserDetails';
 import Reports from '@/pages/Reports';
 import Analytics from '@/pages/Analytics';
+import AdminDocumentUpload from '@/pages/AdminDocumentUpload';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -102,6 +103,11 @@ const AppRoutes = () => {
       <Route path="/analytics" element={
         <ProtectedRoute allowedRoles={['admin']}>
           <Analytics />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin-document-upload" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <AdminDocumentUpload />
         </ProtectedRoute>
       } />
       <Route path="/unauthorized" element={<Unauthorized />} />

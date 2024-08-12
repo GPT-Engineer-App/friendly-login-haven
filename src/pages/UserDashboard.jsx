@@ -3,7 +3,8 @@ import { useAuth } from '@/context/AuthContext';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, FileText, Bell } from 'lucide-react';
+import { User, FileText, Bell, Upload } from 'lucide-react';
+import DocumentUpload from '@/components/DocumentUpload';
 
 const UserDashboard = () => {
   const { user, logout } = useAuth();
@@ -33,6 +34,17 @@ const UserDashboard = () => {
         <div className="px-4 py-6 sm:px-0">
           <h2 className="text-3xl font-semibold text-gray-800 mb-6">Welcome, {user?.employeeData?.name || user?.email}</h2>
           <div className="grid gap-6 mb-8 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Upload className="mr-2" />
+                  Document Upload
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <DocumentUpload userId={user?.id} />
+              </CardContent>
+            </Card>
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">

@@ -3,7 +3,8 @@ import { useAuth } from '@/context/AuthContext';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Briefcase, Calendar, UserPlus, Settings, FileText, BarChart2 } from 'lucide-react';
+import { Users, Briefcase, Calendar, UserPlus, Settings, FileText, BarChart2, Upload } from 'lucide-react';
+import DocumentUpload from '@/components/DocumentUpload';
 import Sidebar from '@/components/Sidebar';
 import { useEmployees } from '@/hooks/useEmployees';
 import { useUsers } from '@/hooks/useUsers';
@@ -27,6 +28,7 @@ const AdminDashboard = () => {
     { title: 'User Management', value: 'Manage', icon: Settings, action: () => navigate('/user-management') },
     { title: 'Reports', value: 'Generate', icon: FileText, action: () => navigate('/reports') },
     { title: 'Analytics', value: 'View', icon: BarChart2, action: () => navigate('/analytics') },
+    { title: 'Document Upload', value: 'Upload', icon: Upload, action: () => navigate('/admin-document-upload') },
   ];
 
   return (
