@@ -60,7 +60,7 @@ const UserDashboard = () => {
   const handleDownload = async (document) => {
     try {
       const bucketName = 'user_documents';
-      const filePath = `employee_${user.employeeData.emp_id}/${document.file_name}`;
+      const filePath = `${user.employeeData.emp_id}_kyc/${document.file_name}`;
       let { data, error } = await supabase.storage
         .from(bucketName)
         .download(filePath);
