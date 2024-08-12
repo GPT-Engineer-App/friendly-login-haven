@@ -70,8 +70,7 @@ export const useUpdateEmployee = () => {
         .from('employees')
         .update({
           ...updates,
-          updated_at: new Date().toISOString(),
-          updated_by: user?.id, // Use the current user's ID
+          last_upd_by: user?.id, // Use the current user's ID
         })
         .eq('user_id', id)
         .select();
