@@ -42,11 +42,19 @@ const CreateUser = () => {
       });
       navigate('/admin-dashboard');
     } catch (error) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to create user",
-        variant: "destructive",
-      });
+      if (error.message.includes('Max retries reached')) {
+        toast({
+          title: "Error",
+          description: "Unable to create user due to high traffic. Please try again later.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: error.message || "Failed to create user",
+          variant: "destructive",
+        });
+      }
     }
   };
 
