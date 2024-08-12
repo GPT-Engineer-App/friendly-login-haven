@@ -80,13 +80,14 @@ const DocumentUpload = ({ adminMode = false }) => {
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${documentType}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const rootFolder = 'user_documents';
       const folderName = user.employeeData.emp_id.replace(/\//g, '_') + '_kyc';
-      const filePath = `${folderName}/${fileName}`;
+      const filePath = `${rootFolder}/${folderName}/${fileName}`;
       console.log('Uploading file to:', filePath);
 
       const { error: uploadError } = await supabase.storage
-        .from('user_documents')
-        .upload(filePath, file);
+        .from(rootFolder)
+        .upload(`${folderName}/${fileName}`, file);
 
       if (uploadError) {
         console.error('Upload error:', uploadError);
@@ -99,7 +100,7 @@ const DocumentUpload = ({ adminMode = false }) => {
           user_id: user.id,
           emp_id: user.employeeData.emp_id,
           file_name: fileName,
-          file_path: filePath,
+          file_path: `${folderName}/${fileName}`,
           file_type: file.type,
           document_type: documentType,
           uploaded_by: user.id,
