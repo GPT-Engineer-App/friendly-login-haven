@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase';
 import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 
 export const useEmployees = () => {
   const { user } = useAuth();
@@ -63,6 +64,7 @@ export const useAddEmployee = () => {
 
 export const useUpdateEmployee = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   return useMutation({
     mutationFn: async ({ id, ...updates }) => {
       const { data, error } = await supabase
@@ -70,7 +72,7 @@ export const useUpdateEmployee = () => {
         .update({
           ...updates,
           updated_at: new Date().toISOString(),
-          updated_by: 'system', // You might want to replace this with the actual user ID
+          updated_by: user?.id, // Use the current user's ID
         })
         .eq('user_id', id)
         .select();
