@@ -85,15 +85,20 @@ const DocumentUpload = ({ adminMode = false }) => {
       const filePath = `${rootFolder}/${folderName}/${fileName}`;
       console.log('Uploading file to:', filePath);
 
-      const { error: uploadError } = await supabase.storage
+      // Use RLS policy for storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from(rootFolder)
-        .upload(`${folderName}/${fileName}`, file);
+        .upload(`${folderName}/${fileName}`, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
 
       if (uploadError) {
         console.error('Upload error:', uploadError);
         throw uploadError;
       }
 
+      // Use RLS policy for database insertion
       const { data: insertData, error: insertError } = await supabase
         .from('documents')
         .insert({
@@ -109,15 +114,10 @@ const DocumentUpload = ({ adminMode = false }) => {
 
       if (insertError) {
         console.error('Error inserting document record:', insertError);
-        console.error('Insert payload:', {
-          user_id: user.id,
-          emp_id: user.employeeData.emp_id,
-          file_name: fileName,
-          file_path: filePath,
-          file_type: file.type,
-          document_type: documentType,
-          uploaded_by: user.id,
-        });
+        // If insert fails, remove the uploaded file
+        await supabase.storage
+          .from(rootFolder)
+          .remove([`${folderName}/${fileName}`]);
         throw insertError;
       }
 
