@@ -84,3 +84,22 @@ export const useUpdateEmployee = () => {
     },
   });
 };
+
+export const useDeleteEmployee = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id) => {
+      const { error } = await supabase
+        .from('employees')
+        .delete()
+        .eq('user_id', id);
+      if (error) {
+        console.error('Supabase error:', error);
+        throw new Error(error.message);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries('employees');
+    },
+  });
+};

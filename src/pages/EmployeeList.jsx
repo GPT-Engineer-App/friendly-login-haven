@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useEmployees } from '@/hooks/useEmployees';
+import { useEmployees, useDeleteEmployee } from '@/hooks/useEmployees';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
@@ -9,9 +9,11 @@ import Sidebar from '@/components/Sidebar';
 import { useNavigate } from 'react-router-dom';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import ViewModal from '@/components/ViewModal';
+import { useToast } from "@/components/ui/use-toast";
 
 const EmployeeList = () => {
   const { data: employees, isLoading, isError } = useEmployees();
+  const deleteEmployee = useDeleteEmployee();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortColumn, setSortColumn] = useState('');
   const [sortDirection, setSortDirection] = useState('asc');
@@ -19,6 +21,7 @@ const EmployeeList = () => {
   const [employeeToDelete, setEmployeeToDelete] = useState(null);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const navigate = useNavigate();
+  const { toast } = useToast();
   const itemsPerPage = 10;
 
   const handleSort = (column) => {
@@ -150,10 +153,21 @@ const EmployeeList = () => {
         <DeleteConfirmationDialog
           isOpen={!!employeeToDelete}
           onClose={() => setEmployeeToDelete(null)}
-          onConfirm={() => {
-            // Implement delete logic here
-            console.log('Delete employee:', employeeToDelete);
-            setEmployeeToDelete(null);
+          onConfirm={async () => {
+            try {
+              await deleteEmployee.mutateAsync(employeeToDelete.user_id);
+              toast({
+                title: "Success",
+                description: "Employee deleted successfully",
+              });
+              setEmployeeToDelete(null);
+            } catch (error) {
+              toast({
+                title: "Error",
+                description: error.message || "Failed to delete employee",
+                variant: "destructive",
+              });
+            }
           }}
         />
       )}
