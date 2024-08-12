@@ -15,6 +15,15 @@ const DocumentUpload = ({ adminMode = false }) => {
   const [documentType, setDocumentType] = useState('');
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUser(user);
+    };
+    fetchCurrentUser();
+  }, []);
 
   const documentTypes = [
     { value: 'aadhar', label: 'Aadhar Card' },
@@ -68,7 +77,7 @@ const DocumentUpload = ({ adminMode = false }) => {
   };
 
   const handleUpload = async () => {
-    if (!file || !documentType || !user?.id) {
+    if (!file || !documentType || !currentUser) {
       toast({
         title: "Error",
         description: "Please select a file, document type, and ensure you're logged in",
@@ -79,18 +88,13 @@ const DocumentUpload = ({ adminMode = false }) => {
 
     setUploading(true);
     try {
-      const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser();
-      if (userError || !currentUser) {
-        throw new Error('User not authenticated');
-      }
-
       console.log('User data:', currentUser);
-      console.log('Employee data:', user.employeeData);
+      console.log('Employee data:', user?.employeeData);
 
       const fileExt = file.name.split('.').pop();
       const fileName = `${documentType}_${uuidv4()}.${fileExt}`;
       const rootFolder = 'user_documents';
-      const folderName = `${user.employeeData.emp_id.replace(/\//g, '_')}_kyc`;
+      const folderName = `${user?.employeeData?.emp_id?.replace(/\//g, '_') || currentUser.id}_kyc`;
       const filePath = `${folderName}/${fileName}`;
       console.log('Uploading file to:', filePath);
 
@@ -112,7 +116,7 @@ const DocumentUpload = ({ adminMode = false }) => {
         .from('documents')
         .insert({
           user_id: currentUser.id,
-          emp_id: user.employeeData?.emp_id,
+          emp_id: user?.employeeData?.emp_id || currentUser.id,
           file_name: fileName,
           file_path: filePath,
           file_type: file.type,
