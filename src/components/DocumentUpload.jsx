@@ -5,14 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from '@/integrations/supabase';
+import { useAuth } from '@/context/AuthContext';
 
-const DocumentUpload = ({ userId, adminMode = false }) => {
+const DocumentUpload = ({ adminMode = false }) => {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [employeeId, setEmployeeId] = useState(null);
   const [documentType, setDocumentType] = useState('');
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const documentTypes = [
     { value: 'aadhar', label: 'Aadhar Card' },
@@ -26,33 +27,15 @@ const DocumentUpload = ({ userId, adminMode = false }) => {
     { value: 'bank_passbook', label: 'Bank Passbook (Front Page)' },
   ];
 
-  useEffect(() => {
-    const fetchEmployeeId = async () => {
-      const { data, error } = await supabase
-        .from('users')
-        .select('emp_id')
-        .eq('user_id', userId)
-        .single();
-
-      if (error) {
-        console.error('Error fetching employee ID:', error);
-      } else {
-        setEmployeeId(data.emp_id);
-      }
-    };
-
-    fetchEmployeeId();
-  }, [userId]);
-
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
 
   const handleUpload = async () => {
-    if (!file || !employeeId || !documentType) {
+    if (!file || !documentType || !user?.employeeData?.emp_id) {
       toast({
         title: "Error",
-        description: "Please select a file, document type, and ensure employee ID is available",
+        description: "Please select a file, document type, and ensure you're logged in",
         variant: "destructive",
       });
       return;
@@ -62,49 +45,35 @@ const DocumentUpload = ({ userId, adminMode = false }) => {
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${documentType}_${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `${employeeId}_kyc/${fileName}`;
+      const filePath = `${user.employeeData.emp_id}_kyc/${fileName}`;
 
-      const bucketName = 'user_documents';
-      let { error: uploadError } = await supabase.storage
-        .from(bucketName)
+      const { error: uploadError } = await supabase.storage
+        .from('user_documents')
         .upload(filePath, file);
 
-      if (uploadError) {
-        console.error('Upload error:', uploadError);
-        throw new Error(`Upload failed: ${uploadError.message}`);
-      }
+      if (uploadError) throw uploadError;
 
-      try {
-        const { data, error: insertError } = await supabase
-          .from('documents')
-          .insert({
-            user_id: userId,
-            emp_id: employeeId,
-            file_name: file.name,
-            file_path: filePath,
-            file_type: file.type,
-            document_type: documentType,
-            uploaded_by: adminMode ? (await supabase.auth.getUser()).data.user.id : userId,
-          })
-          .select();
-
-        if (insertError) {
-          console.error('Insert error:', insertError);
-          throw new Error(`Database insert failed: ${insertError.message}`);
-        }
-
-        toast({
-          title: "Success",
-          description: "Document uploaded successfully",
+      const { error: insertError } = await supabase
+        .from('documents')
+        .insert({
+          user_id: user.id,
+          emp_id: user.employeeData.emp_id,
+          file_name: fileName,
+          file_path: filePath,
+          file_type: file.type,
+          document_type: documentType,
+          uploaded_by: user.id,
         });
-        queryClient.invalidateQueries('userDocuments');
-        setFile(null);
-        setDocumentType('');
-      } catch (dbError) {
-        // If database insert fails, delete the uploaded file
-        await supabase.storage.from(bucketName).remove([filePath]);
-        throw dbError;
-      }
+
+      if (insertError) throw insertError;
+
+      toast({
+        title: "Success",
+        description: "Document uploaded successfully",
+      });
+      queryClient.invalidateQueries('userDocuments');
+      setFile(null);
+      setDocumentType('');
     } catch (error) {
       console.error('Error uploading document:', error);
       toast({
@@ -132,7 +101,7 @@ const DocumentUpload = ({ userId, adminMode = false }) => {
         </SelectContent>
       </Select>
       <Input type="file" onChange={handleFileChange} />
-      <Button onClick={handleUpload} disabled={uploading || !file || !employeeId || !documentType}>
+      <Button onClick={handleUpload} disabled={uploading || !file || !documentType}>
         {uploading ? 'Uploading...' : 'Upload Document'}
       </Button>
     </div>
