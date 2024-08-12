@@ -8,7 +8,9 @@ import { useNavigate } from 'react-router-dom';
 import Sidebar from '@/components/Sidebar';
 import { useToast } from "@/components/ui/use-toast";
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
+import ViewModal from '@/components/ViewModal';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Eye, Edit, Trash2, Search } from 'lucide-react';
 
 const UserManagement = () => {
   const { data: users, isLoading, isError } = useUsers();
@@ -21,6 +23,7 @@ const UserManagement = () => {
   const [sortColumn, setSortColumn] = useState('username');
   const [sortDirection, setSortDirection] = useState('asc');
   const [userToDelete, setUserToDelete] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -141,9 +144,15 @@ const UserManagement = () => {
                         <TableCell>{user.status || 'N/A'}</TableCell>
                         <TableCell>{user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</TableCell>
                         <TableCell>
-                          <Button variant="outline" size="sm" className="mr-2" onClick={() => navigate(`/edit-user/${user.user_id}`)}>Edit</Button>
-                          <Button variant="outline" size="sm" className="mr-2" onClick={() => navigate(`/user-details/${user.user_id}`)}>View</Button>
-                          <Button variant="destructive" size="sm" onClick={() => setUserToDelete(user)}>Delete</Button>
+                          <Button variant="ghost" size="icon" onClick={() => setSelectedUser(user)}>
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" onClick={() => navigate(`/edit-user/${user.user_id}`)}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" onClick={() => setUserToDelete(user)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -178,6 +187,14 @@ const UserManagement = () => {
         onClose={() => setUserToDelete(null)}
         onConfirm={handleDeleteUser}
       />
+      {selectedUser && (
+        <ViewModal
+          isOpen={!!selectedUser}
+          onClose={() => setSelectedUser(null)}
+          title="User Details"
+          data={selectedUser}
+        />
+      )}
     </div>
   );
 };

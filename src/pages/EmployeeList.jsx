@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Edit, Trash2, Search } from 'lucide-react';
+import { Eye, Edit, Trash2, Search } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import { useNavigate } from 'react-router-dom';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
+import ViewModal from '@/components/ViewModal';
 
 const EmployeeList = () => {
   const { data: employees, isLoading, isError } = useEmployees();
@@ -15,7 +16,8 @@ const EmployeeList = () => {
   const [sortColumn, setSortColumn] = useState('');
   const [sortDirection, setSortDirection] = useState('asc');
   const [currentPage, setCurrentPage] = useState(1);
-  const [employeesToDelete, setEmployeesToDelete] = useState(null);
+  const [employeeToDelete, setEmployeeToDelete] = useState(null);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
   const navigate = useNavigate();
   const itemsPerPage = 10;
 
@@ -108,10 +110,13 @@ const EmployeeList = () => {
                     <TableCell>{employee.phone_no}</TableCell>
                     <TableCell>{new Date(employee.date_of_joining).toLocaleDateString()}</TableCell>
                     <TableCell>
+                      <Button variant="ghost" size="icon" onClick={() => setSelectedEmployee(employee)}>
+                        <Eye className="h-4 w-4" />
+                      </Button>
                       <Button variant="ghost" size="icon" onClick={() => navigate(`/edit-employee/${employee.user_id}`)}>
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => setEmployeesToDelete(employee)}>
+                      <Button variant="ghost" size="icon" onClick={() => setEmployeeToDelete(employee)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </TableCell>
@@ -141,15 +146,23 @@ const EmployeeList = () => {
           </div>
         </main>
       </div>
-      {employeesToDelete && (
+      {employeeToDelete && (
         <DeleteConfirmationDialog
-          isOpen={!!employeesToDelete}
-          onClose={() => setEmployeesToDelete(null)}
+          isOpen={!!employeeToDelete}
+          onClose={() => setEmployeeToDelete(null)}
           onConfirm={() => {
             // Implement delete logic here
-            console.log('Delete employee:', employeesToDelete);
-            setEmployeesToDelete(null);
+            console.log('Delete employee:', employeeToDelete);
+            setEmployeeToDelete(null);
           }}
+        />
+      )}
+      {selectedEmployee && (
+        <ViewModal
+          isOpen={!!selectedEmployee}
+          onClose={() => setSelectedEmployee(null)}
+          title="Employee Details"
+          data={selectedEmployee}
         />
       )}
     </div>
