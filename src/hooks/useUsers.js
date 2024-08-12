@@ -39,73 +39,64 @@ export const useCreateUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (userData) => {
-      const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-      const maxRetries = 3;
-      let retries = 0;
+      // Create the user in the users table first
+      const { data: newUser, error: userError } = await supabase
+        .from('users')
+        .insert([{
+          username: userData.username,
+          email: userData.email,
+          role: userData.role,
+          status: 'active',
+          emp_id: userData.emp_id,
+          created_by: queryClient.getQueryData(['user'])?.id,
+        }])
+        .select()
+        .single();
 
-      while (retries < maxRetries) {
-        try {
-          // First, create the auth user
-          const { data: authUser, error: authError } = await supabase.auth.signUp({
-            email: userData.email,
-            password: userData.password,
-          });
+      if (userError) throw new Error(userError.message);
 
-          if (authError) {
-            if (authError.status === 429) {
-              retries++;
-              await delay(2000 * retries); // Exponential backoff
-              continue;
-            }
-            throw new Error(authError.message);
-          }
+      // Then create the auth user
+      const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
+        email: userData.email,
+        password: userData.password,
+        email_confirm: true,
+      });
 
-          // Then, insert the user data into the users table
-          const { data, error } = await supabase
-            .from('users')
-            .insert([{
-              user_id: authUser.user.id,
-              username: userData.username,
-              email: userData.email,
-              role: userData.role,
-              status: userData.status,
-              emp_id: userData.emp_id,
-              created_by: queryClient.getQueryData(['user'])?.id,
-            }])
-            .select();
+      if (authError) {
+        // If there's an error, delete the user we just created
+        await supabase.from('users').delete().eq('id', newUser.id);
+        throw new Error(authError.message);
+      }
 
-          if (error) {
-            // If there's an error, we should delete the auth user we just created
-            await supabase.auth.admin.deleteUser(authUser.user.id);
-            throw new Error(error.message);
-          }
+      // Update the user record with the auth user id
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({ user_id: authUser.user.id })
+        .eq('id', newUser.id);
 
-          // Update the employee record with the new user_id if applicable
-          if (userData.emp_id) {
-            const { error: empError } = await supabase
-              .from('employees')
-              .update({ user_id: authUser.user.id })
-              .eq('id', userData.emp_id);
+      if (updateError) {
+        // If there's an error, clean up both the auth user and the user record
+        await supabase.auth.admin.deleteUser(authUser.user.id);
+        await supabase.from('users').delete().eq('id', newUser.id);
+        throw new Error(updateError.message);
+      }
 
-            if (empError) {
-              // If there's an error, we should delete the auth user and the user record
-              await supabase.auth.admin.deleteUser(authUser.user.id);
-              await supabase.from('users').delete().eq('user_id', authUser.user.id);
-              throw new Error(empError.message);
-            }
-          }
+      // Update the employee record with the new user_id if applicable
+      if (userData.emp_id) {
+        const { error: empError } = await supabase
+          .from('employees')
+          .update({ user_id: authUser.user.id })
+          .eq('id', userData.emp_id);
 
-          return data[0];
-        } catch (error) {
-          if (error.status === 429 && retries < maxRetries - 1) {
-            retries++;
-            await delay(2000 * retries); // Exponential backoff
-          } else {
-            throw error;
-          }
+        if (empError) {
+          // If there's an error, clean up everything
+          await supabase.auth.admin.deleteUser(authUser.user.id);
+          await supabase.from('users').delete().eq('id', newUser.id);
+          throw new Error(empError.message);
         }
       }
-      throw new Error('Max retries reached. Unable to create user.');
+
+      return { ...newUser, user_id: authUser.user.id };
     },
     onSuccess: () => {
       queryClient.invalidateQueries('users');
