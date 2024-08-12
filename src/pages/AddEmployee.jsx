@@ -47,7 +47,7 @@ const AddEmployee = () => {
       console.error('Error adding employee:', error);
       toast({
         title: "Error",
-        description: "Failed to add employee. The employee may have been added but document folder creation failed. Please check and try again if necessary.",
+        description: "Failed to add employee. Please try again.",
         variant: "destructive",
       });
     }

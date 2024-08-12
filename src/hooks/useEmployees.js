@@ -61,13 +61,6 @@ export const useAddEmployee = () => {
           throw new Error(error.message);
         }
 
-        // Create folder for the new employee
-        const folderCreated = await createEmployeeFolder(data[0].emp_id, data[0].user_id);
-
-        if (!folderCreated) {
-          console.warn('Employee added but folder creation failed');
-        }
-
         console.log('Employee added successfully');
         return data[0];
       } catch (error) {
@@ -81,28 +74,7 @@ export const useAddEmployee = () => {
   });
 };
 
-// Add this new function at the end of the file
-async function createEmployeeFolder(empId, userId) {
-  try {
-    // Create an empty file to ensure the folder exists
-    const folderPath = `employee_${empId}/`;
-    const { data, error } = await supabase.storage
-      .from('user_documents')
-      .upload(`${folderPath}.keep`, new Blob(['']));
-
-    if (error) {
-      console.error('Error creating employee folder:', error);
-      // Instead of throwing an error, we'll return false to indicate failure
-      return false;
-    }
-
-    console.log('Employee folder created successfully');
-    return true;
-  } catch (error) {
-    console.error('Error creating employee folder:', error);
-    return false;
-  }
-}
+// Remove the createEmployeeFolder function as it's no longer needed
 
 export const useUpdateEmployee = () => {
   const queryClient = useQueryClient();
