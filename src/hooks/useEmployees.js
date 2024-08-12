@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase';
+import { supabase, supabaseAdmin } from '@/integrations/supabase';
 import { useAuth } from '@/context/AuthContext';
 
 export const useEmployees = () => {
@@ -62,7 +62,7 @@ export const useAddEmployee = () => {
         }
 
         // Call the function to create the employee folder and set up policies
-        const { error: folderError } = await supabaseAdmin.rpc('create_employee_folder', {
+        const { error: folderError } = await supabase.rpc('create_employee_folder', {
           emp_id: data[0].emp_id,
           user_id: data[0].user_id
         });
