@@ -48,9 +48,9 @@ const DocumentUpload = ({ userId, adminMode = false }) => {
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `${fileName}`;
+      const filePath = `${userId}/${fileName}`;
 
-      const bucketName = `employee_${employeeId.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()}`;
+      const bucketName = 'user_documents';
       const { error: uploadError } = await supabase.storage
         .from(bucketName)
         .upload(filePath, file);
