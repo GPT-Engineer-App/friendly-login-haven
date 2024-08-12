@@ -9,7 +9,6 @@ import Sidebar from '@/components/Sidebar';
 import { useToast } from "@/components/ui/use-toast";
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 
 const UserManagement = () => {
   const { data: users, isLoading, isError } = useUsers();
