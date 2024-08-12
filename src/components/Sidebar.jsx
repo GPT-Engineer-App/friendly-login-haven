@@ -5,8 +5,7 @@ import { Users, UserPlus, Search, Home, UserCog } from 'lucide-react';
 const Sidebar = () => {
   const navItems = [
     { icon: Home, label: 'Dashboard', to: '/admin-dashboard' },
-    { icon: Users, label: 'Employee List', to: '/employee-list' },
-    { icon: UserPlus, label: 'Add Employee', to: '/add-employee' },
+    { icon: Users, label: 'Employee Management', to: '/employee-list' },
     { icon: UserCog, label: 'User Management', to: '/user-management' },
   ];
 

@@ -55,20 +55,27 @@ const EmployeeList = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
           <div className="container mx-auto px-6 py-8">
-            <h1 className="text-3xl font-semibold text-gray-800 mb-6">Employee List</h1>
-            <div className="mb-4 flex items-center">
-              <div className="relative flex-grow max-w-sm">
-                <Input
-                  type="text"
-                  placeholder="Search by Name, ID, or Email"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-              </div>
-              <Button className="ml-2" onClick={() => navigate('/add-employee')}>Add Employee</Button>
-            </div>
+            <h1 className="text-3xl font-semibold text-gray-800 mb-6">Employee Management</h1>
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle>Employee Search and Actions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-4 items-center">
+                  <div className="relative flex-grow max-w-sm">
+                    <Input
+                      type="text"
+                      placeholder="Search by Name, ID, or Email"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                  </div>
+                  <Button onClick={() => navigate('/add-employee')}>Add Employee</Button>
+                </div>
+              </CardContent>
+            </Card>
             <Table>
               <TableHeader>
                 <TableRow>

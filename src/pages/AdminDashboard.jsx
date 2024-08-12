@@ -23,7 +23,7 @@ const AdminDashboard = () => {
     { title: 'Total Employees', value: employeesLoading ? '...' : employees?.length || 0, icon: Users },
     { title: 'Total Users', value: usersLoading ? '...' : users?.length || 0, icon: UserPlus },
     { title: 'User Management', value: 'Manage', icon: UserPlus, action: () => navigate('/user-management') },
-    { title: 'Employee List', value: 'View', icon: Briefcase, action: () => navigate('/employee-list') },
+    { title: 'Employee Management', value: 'Manage', icon: Briefcase, action: () => navigate('/employee-list') },
     { title: 'User Management', value: 'Manage', icon: Settings, action: () => navigate('/user-management') },
     { title: 'Reports', value: 'Generate', icon: FileText, action: () => navigate('/reports') },
     { title: 'Analytics', value: 'View', icon: BarChart2, action: () => navigate('/analytics') },
