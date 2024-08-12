@@ -60,16 +60,20 @@ export const useAddEmployee = () => {
         throw new Error(error.message);
       }
 
-      // Create a folder for the new employee
-      const bucketName = `employee_${data[0].emp_id.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()}`;
+      // Create a folder for the new employee in the user_documents bucket
+      const folderName = `employee_${data[0].emp_id.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()}`;
       try {
-        await supabase.storage.createBucket(bucketName, {
-          public: false,
-          fileSizeLimit: 1024 * 1024 * 10, // 10MB
-        });
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('user_documents')
+          .upload(`${folderName}/.keep`, new Blob(['']));
+
+        if (uploadError) {
+          console.error('Error creating employee folder:', uploadError);
+          throw new Error('Failed to create employee folder');
+        }
       } catch (storageError) {
         console.error('Error creating employee folder:', storageError);
-        // Continue with employee creation even if bucket creation fails
+        throw new Error('Failed to create employee folder');
       }
 
       return data[0];
