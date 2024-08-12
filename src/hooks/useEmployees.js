@@ -80,9 +80,6 @@ export const useAddEmployee = () => {
 // Add this new function at the end of the file
 async function createEmployeeFolder(empId, userId) {
   try {
-    // Call the SQL function to create policies
-    await supabase.rpc('create_employee_folder_policies', { emp_id: empId, user_id: userId });
-
     // Create an empty file to ensure the folder exists
     const folderPath = `employee_${empId}/`;
     const { data, error } = await supabase.storage
@@ -95,7 +92,7 @@ async function createEmployeeFolder(empId, userId) {
     return true;
   } catch (error) {
     console.error('Error creating employee folder:', error.message);
-    throw error;
+    throw new Error('There was an issue setting up the document folder: ' + error.message);
   }
 }
 
