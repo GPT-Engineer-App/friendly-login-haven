@@ -98,7 +98,7 @@ const CreateUser = () => {
                         {isEmployeesError && <SelectItem value="error">Error loading employees</SelectItem>}
                         {employees && employees.length > 0 ? (
                           employees.map((employee) => (
-                            <SelectItem key={employee.id} value={employee.id?.toString() || employee.emp_id}>
+                            <SelectItem key={employee.id || employee.emp_id} value={employee.id?.toString() || employee.emp_id}>
                               {employee.name} ({employee.emp_id})
                             </SelectItem>
                           ))

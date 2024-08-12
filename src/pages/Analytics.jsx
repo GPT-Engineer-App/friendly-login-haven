@@ -29,8 +29,8 @@ const Analytics = () => {
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={data}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
+                    <XAxis dataKey="name" tick={{fill: '#888'}} />
+                    <YAxis tick={{fill: '#888'}} />
                     <Tooltip />
                     <Legend />
                     <Bar dataKey="employees" fill="#8884d8" />
