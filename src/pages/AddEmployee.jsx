@@ -38,6 +38,9 @@ const AddEmployee = () => {
     e.preventDefault();
     try {
       const result = await addEmployee.mutateAsync(employeeData);
+      if (result.error) {
+        throw new Error(result.error);
+      }
       if (result.folderError) {
         toast({
           title: "Partial Success",

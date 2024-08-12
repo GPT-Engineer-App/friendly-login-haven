@@ -79,11 +79,13 @@ export const useAddEmployee = () => {
         return { employee: data[0] };
       } catch (error) {
         console.error('Error in useAddEmployee:', error);
-        throw error;
+        return { error: error.message || 'An unexpected error occurred' };
       }
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries('employees');
+      if (!data.error) {
+        queryClient.invalidateQueries('employees');
+      }
       return data;
     },
   });
