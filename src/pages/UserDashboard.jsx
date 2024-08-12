@@ -1,14 +1,18 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, FileText, Bell, Upload } from 'lucide-react';
+import { User, FileText, Bell, Upload, Download, Trash2 } from 'lucide-react';
 import DocumentUpload from '@/components/DocumentUpload';
+import { supabase } from '@/integrations/supabase';
+import { useToast } from "@/components/ui/use-toast";
 
 const UserDashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [documents, setDocuments] = useState([]);
+  const { toast } = useToast();
 
   const handleLogout = async () => {
     await logout();
@@ -21,6 +25,78 @@ const UserDashboard = () => {
     { title: 'Employee ID', value: user?.employeeData?.emp_id || 'N/A' },
     { title: 'Designation', value: user?.employeeData?.designation || 'N/A' },
   ];
+
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      if (user?.employeeData?.emp_id) {
+        const { data, error } = await supabase
+          .from('documents')
+          .select('*')
+          .eq('emp_id', user.employeeData.emp_id);
+
+        if (error) {
+          console.error('Error fetching documents:', error);
+        } else {
+          setDocuments(data);
+        }
+      }
+    };
+
+    fetchDocuments();
+  }, [user]);
+
+  const handleDownload = async (document) => {
+    try {
+      const { data, error } = await supabase.storage
+        .from(`employee_${user.employeeData.emp_id}`)
+        .download(document.file_path);
+
+      if (error) throw error;
+
+      const blob = new Blob([data], { type: document.file_type });
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = document.file_name;
+      link.click();
+    } catch (error) {
+      console.error('Error downloading document:', error);
+      toast({
+        title: "Error",
+        description: "Failed to download document",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDelete = async (document) => {
+    try {
+      const { error: deleteError } = await supabase
+        .from('documents')
+        .delete()
+        .eq('id', document.id);
+
+      if (deleteError) throw deleteError;
+
+      const { error: storageError } = await supabase.storage
+        .from(`employee_${user.employeeData.emp_id}`)
+        .remove([document.file_path]);
+
+      if (storageError) throw storageError;
+
+      setDocuments(documents.filter(doc => doc.id !== document.id));
+      toast({
+        title: "Success",
+        description: "Document deleted successfully",
+      });
+    } catch (error) {
+      console.error('Error deleting document:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete document",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -58,6 +134,35 @@ const UserDashboard = () => {
                     <span className="font-semibold">{item.title}:</span> {item.value}
                   </div>
                 ))}
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <FileText className="mr-2" />
+                  My Documents
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {documents.length > 0 ? (
+                  <ul className="space-y-2">
+                    {documents.map((doc) => (
+                      <li key={doc.id} className="flex justify-between items-center">
+                        <span>{doc.file_name}</span>
+                        <div>
+                          <Button variant="ghost" size="sm" onClick={() => handleDownload(doc)}>
+                            <Download className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => handleDelete(doc)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>No documents uploaded yet.</p>
+                )}
               </CardContent>
             </Card>
             <Card>

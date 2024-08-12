@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,18 +8,37 @@ import { supabase } from '@/integrations/supabase';
 const DocumentUpload = ({ userId, adminMode = false }) => {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [employeeId, setEmployeeId] = useState(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const fetchEmployeeId = async () => {
+      const { data, error } = await supabase
+        .from('users')
+        .select('emp_id')
+        .eq('user_id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching employee ID:', error);
+      } else {
+        setEmployeeId(data.emp_id);
+      }
+    };
+
+    fetchEmployeeId();
+  }, [userId]);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
 
   const handleUpload = async () => {
-    if (!file) {
+    if (!file || !employeeId) {
       toast({
         title: "Error",
-        description: "Please select a file to upload",
+        description: "Please select a file to upload and ensure employee ID is available",
         variant: "destructive",
       });
       return;
@@ -29,10 +48,10 @@ const DocumentUpload = ({ userId, adminMode = false }) => {
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `${userId}/${fileName}`;
+      const filePath = `${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('user_documents')
+        .from(`employee_${employeeId}`)
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;
@@ -41,6 +60,7 @@ const DocumentUpload = ({ userId, adminMode = false }) => {
         .from('documents')
         .insert({
           user_id: userId,
+          emp_id: employeeId,
           file_name: file.name,
           file_path: filePath,
           file_type: file.type,
@@ -71,7 +91,7 @@ const DocumentUpload = ({ userId, adminMode = false }) => {
   return (
     <div className="space-y-4">
       <Input type="file" onChange={handleFileChange} />
-      <Button onClick={handleUpload} disabled={uploading || !file}>
+      <Button onClick={handleUpload} disabled={uploading || !file || !employeeId}>
         {uploading ? 'Uploading...' : 'Upload Document'}
       </Button>
     </div>

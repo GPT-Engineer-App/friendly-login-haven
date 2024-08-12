@@ -45,6 +45,7 @@ export const useAddEmployee = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (newEmployee) => {
+      // Insert the new employee
       const { data, error } = await supabase
         .from('employees')
         .insert([{
@@ -53,10 +54,25 @@ export const useAddEmployee = () => {
           updated_at: new Date().toISOString()
         }])
         .select();
+      
       if (error) {
         console.error('Supabase error:', error);
         throw new Error(error.message);
       }
+
+      // Create a folder for the new employee
+      const { error: storageError } = await supabase
+        .storage
+        .createBucket(`employee_${data[0].emp_id}`, {
+          public: false,
+          fileSizeLimit: 1024 * 1024 * 10, // 10MB
+        });
+
+      if (storageError) {
+        console.error('Error creating employee folder:', storageError);
+        throw new Error('Failed to create employee folder');
+      }
+
       return data[0];
     },
     onSuccess: () => {
