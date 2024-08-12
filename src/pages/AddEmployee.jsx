@@ -37,7 +37,7 @@ const AddEmployee = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const result = await addEmployee.mutateAsync(employeeData);
+      const newEmployee = await addEmployee.mutateAsync(employeeData);
       toast({
         title: "Success",
         description: "Employee added successfully with document folder created",

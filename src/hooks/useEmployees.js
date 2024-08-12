@@ -61,33 +61,43 @@ export const useAddEmployee = () => {
           throw new Error(error.message);
         }
 
-        // Call the function to create the employee folder and set up policies
-        const { data: folderData, error: folderError } = await supabase.rpc('create_employee_folder', {
-          emp_id: data[0].emp_id,
-          user_id: data[0].user_id
-        });
+        // Create folder for the new employee
+        await createEmployeeFolder(data[0].emp_id, data[0].user_id);
 
-        if (folderError) {
-          console.error('Error creating employee folder:', folderError);
-          // Instead of returning, we'll throw an error to be caught in the catch block
-          throw new Error(`There was an issue setting up the document folder: ${folderError.message || JSON.stringify(folderError)}`);
-        }
-
-        console.log('Employee folder and policies created successfully');
-        return { employee: data[0] };
+        console.log('Employee added successfully with folder');
+        return data[0];
       } catch (error) {
         console.error('Error in useAddEmployee:', error);
         throw error; // Re-throw the error to be handled by the component
       }
     },
-    onSuccess: (data) => {
-      if (!data.error) {
-        queryClient.invalidateQueries('employees');
-      }
-      return data;
+    onSuccess: () => {
+      queryClient.invalidateQueries('employees');
     },
   });
 };
+
+// Add this new function at the end of the file
+async function createEmployeeFolder(empId, userId) {
+  try {
+    // Call the SQL function to create policies
+    await supabase.rpc('create_employee_folder_policies', { emp_id: empId, user_id: userId });
+
+    // Create an empty file to ensure the folder exists
+    const folderPath = `employee_${empId}/`;
+    const { data, error } = await supabase.storage
+      .from('user_documents')
+      .upload(`${folderPath}.keep`, new Blob(['']));
+
+    if (error) throw error;
+
+    console.log('Employee folder created successfully');
+    return true;
+  } catch (error) {
+    console.error('Error creating employee folder:', error.message);
+    throw error;
+  }
+}
 
 export const useUpdateEmployee = () => {
   const queryClient = useQueryClient();
