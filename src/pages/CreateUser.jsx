@@ -43,6 +43,7 @@ const CreateUser = () => {
       // Log the userData being sent (remove in production)
       console.log("Sending user data:", userData);
 
+      // Note: Password is now sent as plain text
       await createUser.mutateAsync(userData);
       toast({
         title: "Success",
