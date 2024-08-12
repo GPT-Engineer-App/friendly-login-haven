@@ -48,12 +48,15 @@ const UserDashboard = () => {
   const handleDownload = async (document) => {
     try {
       const bucketName = 'user_documents';
-      const filePath = `${user.id}/${document.file_path}`;
-      const { data, error } = await supabase.storage
+      const filePath = `${user.id}/${document.file_name}`;
+      let { data, error } = await supabase.storage
         .from(bucketName)
         .download(filePath);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error downloading document:', error);
+        throw error;
+      }
 
       const blob = new Blob([data], { type: document.file_type });
       const link = document.createElement('a');
@@ -79,12 +82,16 @@ const UserDashboard = () => {
 
       if (deleteError) throw deleteError;
 
-      const bucketName = `employee_${user.employeeData.emp_id.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()}`;
+      const bucketName = 'user_documents';
+      const filePath = `${user.id}/${document.file_name}`;
       const { error: storageError } = await supabase.storage
         .from(bucketName)
-        .remove([document.file_path]);
+        .remove([filePath]);
 
-      if (storageError) throw storageError;
+      if (storageError) {
+        console.error('Error deleting file from storage:', storageError);
+        throw storageError;
+      }
 
       setDocuments(documents.filter(doc => doc.id !== document.id));
       toast({

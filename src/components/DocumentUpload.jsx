@@ -51,9 +51,12 @@ const DocumentUpload = ({ userId, adminMode = false }) => {
       const filePath = `${userId}/${fileName}`;
 
       const bucketName = 'user_documents';
-      const { error: uploadError } = await supabase.storage
+      let { error: uploadError } = await supabase.storage
         .from(bucketName)
-        .upload(filePath, file);
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
 
       if (uploadError) throw uploadError;
 
