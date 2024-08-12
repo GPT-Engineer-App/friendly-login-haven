@@ -41,13 +41,13 @@ const AddEmployee = () => {
       if (result.folderError) {
         toast({
           title: "Partial Success",
-          description: `Employee added successfully. ${result.folderError}`,
+          description: `Employee added successfully, but there was an issue with the document folder: ${result.folderError}`,
           variant: "warning",
         });
       } else {
         toast({
           title: "Success",
-          description: "Employee added successfully",
+          description: "Employee added successfully with document folder created",
         });
       }
       navigate('/employee-list'); // Redirect to employee list after addition
@@ -55,7 +55,7 @@ const AddEmployee = () => {
       console.error('Error adding employee:', error);
       toast({
         title: "Error",
-        description: "Failed to add employee. Please try again.",
+        description: error.message || "Failed to add employee. Please try again.",
         variant: "destructive",
       });
     }

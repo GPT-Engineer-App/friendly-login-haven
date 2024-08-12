@@ -62,14 +62,13 @@ export const useAddEmployee = () => {
         }
 
         // Call the function to create the employee folder and set up policies
-        const { error: folderError } = await supabase.rpc('create_employee_folder', {
+        const { data: folderData, error: folderError } = await supabase.rpc('create_employee_folder', {
           emp_id: data[0].emp_id,
           user_id: data[0].user_id
         });
 
         if (folderError) {
           console.error('Error creating employee folder:', folderError);
-          // Instead of throwing an error, we'll return an object with both the employee data and the error
           return {
             employee: data[0],
             folderError: `There was an issue setting up the document folder: ${folderError.message}`
@@ -83,8 +82,9 @@ export const useAddEmployee = () => {
         throw error;
       }
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries('employees');
+      return data;
     },
   });
 };
