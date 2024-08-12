@@ -40,14 +40,14 @@ const AddEmployee = () => {
       const newEmployee = await addEmployee.mutateAsync(employeeData);
       toast({
         title: "Success",
-        description: "Employee added successfully with document folder created",
+        description: "Employee added successfully",
       });
       navigate('/employee-list');
     } catch (error) {
       console.error('Error adding employee:', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to add employee. Please try again.",
+        description: "Failed to add employee. The employee may have been added but document folder creation failed. Please check and try again if necessary.",
         variant: "destructive",
       });
     }

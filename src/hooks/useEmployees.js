@@ -62,9 +62,13 @@ export const useAddEmployee = () => {
         }
 
         // Create folder for the new employee
-        await createEmployeeFolder(data[0].emp_id, data[0].user_id);
+        const folderCreated = await createEmployeeFolder(data[0].emp_id, data[0].user_id);
 
-        console.log('Employee added successfully with folder');
+        if (!folderCreated) {
+          console.warn('Employee added but folder creation failed');
+        }
+
+        console.log('Employee added successfully');
         return data[0];
       } catch (error) {
         console.error('Error in useAddEmployee:', error);
@@ -86,13 +90,17 @@ async function createEmployeeFolder(empId, userId) {
       .from('user_documents')
       .upload(`${folderPath}.keep`, new Blob(['']));
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error creating employee folder:', error);
+      // Instead of throwing an error, we'll return false to indicate failure
+      return false;
+    }
 
     console.log('Employee folder created successfully');
     return true;
   } catch (error) {
-    console.error('Error creating employee folder:', error.message);
-    throw new Error('There was an issue setting up the document folder: ' + error.message);
+    console.error('Error creating employee folder:', error);
+    return false;
   }
 }
 
