@@ -15,7 +15,17 @@ const EditEmployee = () => {
   const { data: employee, isLoading, isError } = useEmployee(id);
   const updateEmployee = useUpdateEmployee();
   const { toast } = useToast();
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    emp_id: '',
+    name: '',
+    designation: '',
+    date_of_joining: '',
+    phone_no: '',
+    email: '',
+    address: '',
+    dob: '',
+    emergency_contact_no: '',
+  });
 
   React.useEffect(() => {
     if (employee) {
