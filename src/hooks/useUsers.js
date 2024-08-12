@@ -10,7 +10,11 @@ export const useUsers = () => {
         .select('*')
         .order('created_at', { ascending: false });
       if (error) throw new Error(error.message);
-      return data;
+      return data.map(user => ({
+        ...user,
+        created_at: user.created_at || new Date().toISOString(),
+        updated_at: user.last_updated_at || new Date().toISOString()
+      }));
     },
   });
 };

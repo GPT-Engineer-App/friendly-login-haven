@@ -29,24 +29,26 @@ const UserManagement = () => {
   if (isError) return <div>Error loading users</div>;
 
   const filteredUsers = users
-    .filter(user => 
-      (user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-       user.email.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (roleFilter ? user.role === roleFilter : true) &&
-      (statusFilter ? user.status === statusFilter : true)
-    )
-    .sort((a, b) => {
-      if (a[sortColumn] < b[sortColumn]) return sortDirection === 'asc' ? -1 : 1;
-      if (a[sortColumn] > b[sortColumn]) return sortDirection === 'asc' ? 1 : -1;
-      return 0;
-    });
+    ? users.filter(user => 
+        (user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+         user.email?.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        (roleFilter ? user.role === roleFilter : true) &&
+        (statusFilter ? user.status === statusFilter : true)
+      )
+    : [];
 
-  const paginatedUsers = filteredUsers.slice(
+  const sortedUsers = [...filteredUsers].sort((a, b) => {
+    if (a[sortColumn] < b[sortColumn]) return sortDirection === 'asc' ? -1 : 1;
+    if (a[sortColumn] > b[sortColumn]) return sortDirection === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  const paginatedUsers = sortedUsers.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  const totalPages = Math.ceil(sortedUsers.length / itemsPerPage);
 
   const handleSort = (column) => {
     if (column === sortColumn) {
@@ -58,6 +60,7 @@ const UserManagement = () => {
   };
 
   const handleDeleteUser = async () => {
+    if (!userToDelete) return;
     try {
       await deleteUser.mutateAsync(userToDelete.user_id);
       toast({
@@ -133,11 +136,11 @@ const UserManagement = () => {
                   <TableBody>
                     {paginatedUsers.map((user) => (
                       <TableRow key={user.user_id}>
-                        <TableCell>{user.username}</TableCell>
-                        <TableCell>{user.email}</TableCell>
-                        <TableCell>{user.role}</TableCell>
-                        <TableCell>{user.status}</TableCell>
-                        <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
+                        <TableCell>{user.username || 'N/A'}</TableCell>
+                        <TableCell>{user.email || 'N/A'}</TableCell>
+                        <TableCell>{user.role || 'N/A'}</TableCell>
+                        <TableCell>{user.status || 'N/A'}</TableCell>
+                        <TableCell>{user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</TableCell>
                         <TableCell>
                           <Button variant="outline" size="sm" className="mr-2" onClick={() => navigate(`/edit-user/${user.user_id}`)}>Edit</Button>
                           <Button variant="outline" size="sm" className="mr-2" onClick={() => navigate(`/user-details/${user.user_id}`)}>View</Button>
