@@ -53,7 +53,7 @@ const DocumentUpload = ({ adminMode = false }) => {
 
       if (uploadError) throw uploadError;
 
-      const { error: insertError } = await supabase
+      const { data: insertData, error: insertError } = await supabase
         .from('documents')
         .insert({
           user_id: user.id,
@@ -63,9 +63,15 @@ const DocumentUpload = ({ adminMode = false }) => {
           file_type: file.type,
           document_type: documentType,
           uploaded_by: user.id,
-        });
+        })
+        .select();
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        console.error('Error inserting document record:', insertError);
+        throw insertError;
+      }
+
+      console.log('Inserted document record:', insertData);
 
       toast({
         title: "Success",
