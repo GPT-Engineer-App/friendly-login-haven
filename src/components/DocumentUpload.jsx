@@ -69,35 +69,47 @@ const DocumentUpload = ({ userId, adminMode = false }) => {
         .from(bucketName)
         .upload(filePath, file);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw new Error(`Upload failed: ${uploadError.message}`);
+      }
 
-      const { data, error: insertError } = await supabase
-        .from('documents')
-        .insert({
-          user_id: userId,
-          emp_id: employeeId,
-          file_name: file.name,
-          file_path: filePath,
-          file_type: file.type,
-          document_type: documentType,
-          uploaded_by: adminMode ? (await supabase.auth.getUser()).data.user.id : userId,
-        })
-        .select();
+      try {
+        const { data, error: insertError } = await supabase
+          .from('documents')
+          .insert({
+            user_id: userId,
+            emp_id: employeeId,
+            file_name: file.name,
+            file_path: filePath,
+            file_type: file.type,
+            document_type: documentType,
+            uploaded_by: adminMode ? (await supabase.auth.getUser()).data.user.id : userId,
+          })
+          .select();
 
-      if (insertError) throw insertError;
+        if (insertError) {
+          console.error('Insert error:', insertError);
+          throw new Error(`Database insert failed: ${insertError.message}`);
+        }
 
-      toast({
-        title: "Success",
-        description: "Document uploaded successfully",
-      });
-      queryClient.invalidateQueries('userDocuments');
-      setFile(null);
-      setDocumentType('');
+        toast({
+          title: "Success",
+          description: "Document uploaded successfully",
+        });
+        queryClient.invalidateQueries('userDocuments');
+        setFile(null);
+        setDocumentType('');
+      } catch (dbError) {
+        // If database insert fails, delete the uploaded file
+        await supabase.storage.from(bucketName).remove([filePath]);
+        throw dbError;
+      }
     } catch (error) {
       console.error('Error uploading document:', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to upload document",
+        description: error.message || "Failed to upload document. Please try again.",
         variant: "destructive",
       });
     } finally {
