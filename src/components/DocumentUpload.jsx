@@ -27,6 +27,41 @@ const DocumentUpload = ({ adminMode = false }) => {
     { value: 'bank_passbook', label: 'Bank Passbook (Front Page)' },
   ];
 
+  useEffect(() => {
+    if (user?.employeeData?.emp_id) {
+      checkAndCreateUserFolder();
+    }
+  }, [user]);
+
+  const checkAndCreateUserFolder = async () => {
+    const folderName = user.employeeData.emp_id.replace(/\//g, '_') + '_kyc';
+    const { data, error } = await supabase.storage
+      .from('user_documents')
+      .list(folderName);
+
+    if (error && error.message.includes('Not Found')) {
+      await createUserFolder(folderName);
+    }
+  };
+
+  const createUserFolder = async (folderName) => {
+    try {
+      const { data, error } = await supabase.storage
+        .from('user_documents')
+        .upload(`${folderName}/.keep`, new Blob(['']));
+
+      if (error) throw error;
+      console.log('User folder created successfully');
+    } catch (error) {
+      console.error('Error creating user folder:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create user folder. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
@@ -45,7 +80,8 @@ const DocumentUpload = ({ adminMode = false }) => {
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${documentType}_${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `${user.employeeData.emp_id}_kyc/${fileName}`;
+      const folderName = user.employeeData.emp_id.replace(/\//g, '_') + '_kyc';
+      const filePath = `${folderName}/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from('user_documents')

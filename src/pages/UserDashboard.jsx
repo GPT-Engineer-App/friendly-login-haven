@@ -60,7 +60,8 @@ const UserDashboard = () => {
   const handleDownload = async (document) => {
     try {
       const bucketName = 'user_documents';
-      const filePath = `${user.employeeData.emp_id}_kyc/${document.file_name}`;
+      const folderName = user.employeeData.emp_id.replace(/\//g, '_') + '_kyc';
+      const filePath = `${folderName}/${document.file_name}`;
       let { data, error } = await supabase.storage
         .from(bucketName)
         .download(filePath);
@@ -95,7 +96,8 @@ const UserDashboard = () => {
       if (deleteError) throw deleteError;
 
       const bucketName = 'user_documents';
-      const filePath = `${user.id}/${document.file_name}`;
+      const folderName = user.employeeData.emp_id.replace(/\//g, '_') + '_kyc';
+      const filePath = `${folderName}/${document.file_name}`;
       const { error: storageError } = await supabase.storage
         .from(bucketName)
         .remove([filePath]);
