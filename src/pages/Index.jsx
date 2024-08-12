@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Users, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase';
+
 const Index = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
