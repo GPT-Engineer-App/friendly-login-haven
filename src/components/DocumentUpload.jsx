@@ -15,7 +15,6 @@ const DocumentUpload = ({ adminMode = false }) => {
   const [documentType, setDocumentType] = useState('');
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { user } = useAuth();
 
   const documentTypes = [
     { value: 'aadhar', label: 'Aadhar Card' },
