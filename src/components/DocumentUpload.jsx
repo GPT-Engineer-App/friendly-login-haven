@@ -93,17 +93,17 @@ const DocumentUpload = ({ adminMode = false }) => {
 
       const fileExt = file.name.split('.').pop();
       const fileName = `${documentType}_${uuidv4()}.${fileExt}`;
-      const rootFolder = 'user_documents';
-      const folderName = `${user?.employeeData?.emp_id?.replace(/\//g, '_') || currentUser.id}_kyc`;
-      const filePath = `${folderName}/${fileName}`;
+      const rootFolder = 'employee_kyc';
+      const filePath = `${currentUser.id}/${fileName}`;
       console.log('Uploading file to:', filePath);
 
-      // Use RLS policy for storage
+      // Upload to public storage
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from(rootFolder)
         .upload(filePath, file, {
           cacheControl: '3600',
-          upsert: false
+          upsert: false,
+          public: true
         });
 
       if (uploadError) {
