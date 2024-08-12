@@ -9,6 +9,7 @@ import Sidebar from '@/components/Sidebar';
 import { useCreateUser } from '@/hooks/useUsers';
 import { useToast } from "@/components/ui/use-toast";
 import { useEmployees } from '@/hooks/useEmployees';
+import bcrypt from 'bcryptjs';
 
 const CreateUser = () => {
   const [userData, setUserData] = useState({
@@ -40,11 +41,15 @@ const CreateUser = () => {
         throw new Error("All fields are required");
       }
     
-      // Log the userData being sent (remove in production)
-      console.log("Sending user data:", userData);
+      // Hash the password
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(userData.password, salt);
 
-      // Note: Password is now sent as plain text
-      await createUser.mutateAsync(userData);
+      // Create user with hashed password
+      await createUser.mutateAsync({
+        ...userData,
+        password: hashedPassword
+      });
       toast({
         title: "Success",
         description: "User created successfully",

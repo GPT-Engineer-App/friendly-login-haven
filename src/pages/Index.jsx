@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Users, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase';
+import bcrypt from 'bcryptjs';
 
 const Index = () => {
   const [email, setEmail] = useState('');
@@ -43,7 +44,9 @@ const Index = () => {
         throw new Error('User not found');
       }
 
-      if (userData.password !== password) {
+      // Compare the provided password with the stored hash
+      const isPasswordValid = await bcrypt.compare(password, userData.password);
+      if (!isPasswordValid) {
         throw new Error('Invalid password');
       }
 

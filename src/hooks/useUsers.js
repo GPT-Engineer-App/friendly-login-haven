@@ -42,17 +42,13 @@ export const useCreateUser = () => {
     mutationFn: async (userData) => {
       console.log("Creating user with data:", userData);
 
-      // Hash the password
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(userData.password, salt);
-
       // Create the user in the users table
       const { data: newUser, error: userError } = await supabase
         .from('users')
         .insert([{
           username: userData.username,
           email: userData.email,
-          password: hashedPassword,
+          password: userData.password, // This is already hashed
           role: userData.role,
           status: 'active',
           emp_id: userData.emp_id,
