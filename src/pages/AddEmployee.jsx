@@ -38,20 +38,16 @@ const AddEmployee = () => {
     e.preventDefault();
     try {
       const result = await addEmployee.mutateAsync(employeeData);
-      if (result) {
-        toast({
-          title: "Success",
-          description: "Employee added successfully",
-        });
-        navigate('/employee-list'); // Redirect to employee list after successful addition
-      } else {
-        throw new Error("Failed to add employee");
-      }
+      toast({
+        title: "Success",
+        description: "Employee added successfully",
+      });
+      navigate('/employee-list'); // Redirect to employee list after successful addition
     } catch (error) {
       console.error('Error adding employee:', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to add employee. Please try again.",
+        description: "Failed to add employee. The employee record may have been created, but there was an issue with additional setup. Please check the employee list and try again if necessary.",
         variant: "destructive",
       });
     }

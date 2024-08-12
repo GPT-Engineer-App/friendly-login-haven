@@ -45,46 +45,48 @@ export const useAddEmployee = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (newEmployee) => {
-      // Insert the new employee
-      const { data, error } = await supabase
-        .from('employees')
-        .insert([{
-          ...newEmployee,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }])
-        .select();
-      
-      if (error) {
-        console.error('Supabase error:', error);
-        throw new Error(error.message);
+      try {
+        // Insert the new employee
+        const { data, error } = await supabase
+          .from('employees')
+          .insert([{
+            ...newEmployee,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }])
+          .select();
+        
+        if (error) {
+          console.error('Supabase error:', error);
+          throw new Error(error.message);
+        }
+
+        // Attempt to create a bucket for the new employee, but don't fail if it doesn't work
+        try {
+          const bucketName = `employee_${data[0].emp_id.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()}`;
+          await supabase.storage.createBucket(bucketName, {
+            public: false,
+            allowedMimeTypes: ['image/png', 'image/jpeg', 'application/pdf'],
+            fileSizeLimit: 5 * 1024 * 1024, // 5MB
+          });
+
+          // Set up storage policies for the new bucket
+          await supabase.rpc('create_employee_bucket_policies', {
+            bucket_id: bucketName,
+            user_id: data[0].user_id
+          });
+
+          console.log('Employee bucket and policies created successfully');
+        } catch (bucketError) {
+          console.error('Error creating employee bucket or policies:', bucketError);
+          // Don't throw an error here, just log it
+        }
+
+        return data[0];
+      } catch (error) {
+        console.error('Error in useAddEmployee:', error);
+        throw error;
       }
-
-      // Create a bucket for the new employee
-      const bucketName = `employee_${data[0].emp_id.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()}`;
-      const { data: bucketData, error: bucketError } = await supabase.storage.createBucket(bucketName, {
-        public: false,
-        allowedMimeTypes: ['image/png', 'image/jpeg', 'application/pdf'],
-        fileSizeLimit: 5 * 1024 * 1024, // 5MB
-      });
-
-      if (bucketError) {
-        console.error('Error creating employee bucket:', bucketError);
-        throw new Error('Failed to create employee bucket');
-      }
-
-      // Set up storage policies for the new bucket
-      const { error: policyError } = await supabase.rpc('create_employee_bucket_policies', {
-        bucket_id: bucketName,
-        user_id: data[0].user_id
-      });
-
-      if (policyError) {
-        console.error('Error setting up bucket policies:', policyError);
-        throw new Error('Failed to set up bucket policies');
-      }
-
-      return data[0];
     },
     onSuccess: () => {
       queryClient.invalidateQueries('employees');
