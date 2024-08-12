@@ -38,27 +38,26 @@ const AddEmployee = () => {
     e.preventDefault();
     try {
       const result = await addEmployee.mutateAsync(employeeData);
-      toast({
-        title: "Success",
-        description: "Employee added successfully",
-      });
-      navigate('/employee-list'); // Redirect to employee list after successful addition
-    } catch (error) {
-      console.error('Error adding employee:', error);
-      if (error.message.includes("Employee created successfully")) {
+      if (result.folderError) {
         toast({
           title: "Partial Success",
-          description: error.message,
+          description: `Employee added successfully. ${result.folderError}`,
           variant: "warning",
         });
-        navigate('/employee-list'); // Still redirect as the employee was created
       } else {
         toast({
-          title: "Error",
-          description: "Failed to add employee. Please try again.",
-          variant: "destructive",
+          title: "Success",
+          description: "Employee added successfully",
         });
       }
+      navigate('/employee-list'); // Redirect to employee list after addition
+    } catch (error) {
+      console.error('Error adding employee:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add employee. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 

@@ -69,11 +69,15 @@ export const useAddEmployee = () => {
 
         if (folderError) {
           console.error('Error creating employee folder:', folderError);
-          throw new Error(`Employee created successfully, but there was an issue setting up their document folder: ${folderError.message}`);
+          // Instead of throwing an error, we'll return an object with both the employee data and the error
+          return {
+            employee: data[0],
+            folderError: `There was an issue setting up the document folder: ${folderError.message}`
+          };
         }
 
         console.log('Employee folder and policies created successfully');
-        return data[0];
+        return { employee: data[0] };
       } catch (error) {
         console.error('Error in useAddEmployee:', error);
         throw error;
