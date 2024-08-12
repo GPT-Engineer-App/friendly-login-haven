@@ -60,20 +60,28 @@ export const useAddEmployee = () => {
         throw new Error(error.message);
       }
 
-      // Create a folder for the new employee in the user_documents bucket
-      const folderName = `employee_${data[0].emp_id.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()}`;
-      try {
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('user_documents')
-          .upload(`${folderName}/.keep`, new Blob(['']));
+      // Create a bucket for the new employee
+      const bucketName = `employee_${data[0].emp_id.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()}`;
+      const { data: bucketData, error: bucketError } = await supabase.storage.createBucket(bucketName, {
+        public: false,
+        allowedMimeTypes: ['image/png', 'image/jpeg', 'application/pdf'],
+        fileSizeLimit: 5 * 1024 * 1024, // 5MB
+      });
 
-        if (uploadError) {
-          console.error('Error creating employee folder:', uploadError);
-          throw new Error('Failed to create employee folder');
-        }
-      } catch (storageError) {
-        console.error('Error creating employee folder:', storageError);
-        throw new Error('Failed to create employee folder');
+      if (bucketError) {
+        console.error('Error creating employee bucket:', bucketError);
+        throw new Error('Failed to create employee bucket');
+      }
+
+      // Set up storage policies for the new bucket
+      const { error: policyError } = await supabase.rpc('create_employee_bucket_policies', {
+        bucket_id: bucketName,
+        user_id: data[0].user_id
+      });
+
+      if (policyError) {
+        console.error('Error setting up bucket policies:', policyError);
+        throw new Error('Failed to set up bucket policies');
       }
 
       return data[0];
