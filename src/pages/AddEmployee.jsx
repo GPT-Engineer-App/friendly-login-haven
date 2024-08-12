@@ -37,17 +37,21 @@ const AddEmployee = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await addEmployee.mutateAsync(employeeData);
-      toast({
-        title: "Success",
-        description: "Employee added successfully",
-      });
-      navigate('/employee-list'); // Redirect to employee list after successful addition
+      const result = await addEmployee.mutateAsync(employeeData);
+      if (result) {
+        toast({
+          title: "Success",
+          description: "Employee added successfully",
+        });
+        navigate('/employee-list'); // Redirect to employee list after successful addition
+      } else {
+        throw new Error("Failed to add employee");
+      }
     } catch (error) {
       console.error('Error adding employee:', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to add employee",
+        description: error.message || "Failed to add employee. Please try again.",
         variant: "destructive",
       });
     }
