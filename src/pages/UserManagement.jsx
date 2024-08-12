@@ -32,8 +32,8 @@ const UserManagement = () => {
     ? users.filter(user => 
         (user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
          user.email?.toLowerCase().includes(searchTerm.toLowerCase())) &&
-        (roleFilter ? user.role === roleFilter : true) &&
-        (statusFilter ? user.status === statusFilter : true)
+        (roleFilter && roleFilter !== 'all' ? user.role === roleFilter : true) &&
+        (statusFilter && statusFilter !== 'all' ? user.status === statusFilter : true)
       )
     : [];
 
@@ -101,7 +101,7 @@ const UserManagement = () => {
                       <SelectValue placeholder="Filter by Role" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Roles</SelectItem>
+                      <SelectItem value="all">All Roles</SelectItem>
                       <SelectItem value="admin">Admin</SelectItem>
                       <SelectItem value="user">User</SelectItem>
                     </SelectContent>
@@ -111,7 +111,7 @@ const UserManagement = () => {
                       <SelectValue placeholder="Filter by Status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Statuses</SelectItem>
+                      <SelectItem value="all">All Statuses</SelectItem>
                       <SelectItem value="active">Active</SelectItem>
                       <SelectItem value="inactive">Inactive</SelectItem>
                     </SelectContent>
