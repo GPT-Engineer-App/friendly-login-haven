@@ -44,13 +44,15 @@ const AddEmployee = () => {
           description: `Employee added successfully, but there was an issue with the document folder: ${result.folderError}`,
           variant: "warning",
         });
+        console.error('Folder creation error:', result.folderError);
       } else {
         toast({
           title: "Success",
           description: "Employee added successfully with document folder created",
         });
       }
-      navigate('/employee-list'); // Redirect to employee list after addition
+      // Redirect to employee list after addition, even if there was a folder error
+      navigate('/employee-list');
     } catch (error) {
       console.error('Error adding employee:', error);
       toast({

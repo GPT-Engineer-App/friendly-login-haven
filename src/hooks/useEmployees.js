@@ -71,7 +71,7 @@ export const useAddEmployee = () => {
           console.error('Error creating employee folder:', folderError);
           return {
             employee: data[0],
-            folderError: `There was an issue setting up the document folder: ${folderError.message}`
+            folderError: `There was an issue setting up the document folder: ${folderError.message || JSON.stringify(folderError)}`
           };
         }
 
