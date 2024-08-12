@@ -45,11 +45,20 @@ const AddEmployee = () => {
       navigate('/employee-list'); // Redirect to employee list after successful addition
     } catch (error) {
       console.error('Error adding employee:', error);
-      toast({
-        title: "Error",
-        description: "Failed to add employee. The employee record may have been created, but there was an issue with additional setup. Please check the employee list and try again if necessary.",
-        variant: "destructive",
-      });
+      if (error.message.includes("Employee created successfully")) {
+        toast({
+          title: "Partial Success",
+          description: error.message,
+          variant: "warning",
+        });
+        navigate('/employee-list'); // Still redirect as the employee was created
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to add employee. Please try again.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
