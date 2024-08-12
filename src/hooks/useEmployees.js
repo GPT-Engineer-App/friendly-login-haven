@@ -69,17 +69,15 @@ export const useAddEmployee = () => {
 
         if (folderError) {
           console.error('Error creating employee folder:', folderError);
-          return {
-            employee: data[0],
-            folderError: `There was an issue setting up the document folder: ${folderError.message || JSON.stringify(folderError)}`
-          };
+          // Instead of returning, we'll throw an error to be caught in the catch block
+          throw new Error(`There was an issue setting up the document folder: ${folderError.message || JSON.stringify(folderError)}`);
         }
 
         console.log('Employee folder and policies created successfully');
         return { employee: data[0] };
       } catch (error) {
         console.error('Error in useAddEmployee:', error);
-        return { error: error.message || 'An unexpected error occurred' };
+        throw error; // Re-throw the error to be handled by the component
       }
     },
     onSuccess: (data) => {

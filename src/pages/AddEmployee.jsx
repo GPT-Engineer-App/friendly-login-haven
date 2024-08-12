@@ -38,23 +38,10 @@ const AddEmployee = () => {
     e.preventDefault();
     try {
       const result = await addEmployee.mutateAsync(employeeData);
-      if (result.error) {
-        throw new Error(result.error);
-      }
-      if (result.folderError) {
-        toast({
-          title: "Partial Success",
-          description: `Employee added successfully, but there was an issue with the document folder: ${result.folderError}`,
-          variant: "warning",
-        });
-        console.error('Folder creation error:', result.folderError);
-      } else {
-        toast({
-          title: "Success",
-          description: "Employee added successfully with document folder created",
-        });
-      }
-      // Redirect to employee list after addition, even if there was a folder error
+      toast({
+        title: "Success",
+        description: "Employee added successfully with document folder created",
+      });
       navigate('/employee-list');
     } catch (error) {
       console.error('Error adding employee:', error);
