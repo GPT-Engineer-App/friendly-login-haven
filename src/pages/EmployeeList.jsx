@@ -112,6 +112,8 @@ const EmployeeList = () => {
                     <TableCell>{employee.email}</TableCell>
                     <TableCell>{employee.phone_no}</TableCell>
                     <TableCell>{new Date(employee.date_of_joining).toLocaleDateString()}</TableCell>
+                    <TableCell>{new Date(employee.created_at).toLocaleString()}</TableCell>
+                    <TableCell>{employee.created_by}</TableCell>
                     <TableCell>
                       <Button variant="ghost" size="icon" onClick={() => setSelectedEmployee(employee)}>
                         <Eye className="h-4 w-4" />

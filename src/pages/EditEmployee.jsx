@@ -25,6 +25,10 @@ const EditEmployee = () => {
     address: '',
     dob: '',
     emergency_contact_no: '',
+    created_at: '',
+    updated_at: '',
+    created_by: '',
+    updated_by: '',
   });
 
   React.useEffect(() => {
@@ -39,6 +43,10 @@ const EditEmployee = () => {
         address: employee.address || '',
         dob: employee.dob ? new Date(employee.dob).toISOString().split('T')[0] : '',
         emergency_contact_no: employee.emergency_contact_no || '',
+        created_at: employee.created_at || '',
+        updated_at: employee.updated_at || '',
+        created_by: employee.created_by || '',
+        updated_by: employee.updated_by || '',
       });
     }
   }, [employee]);

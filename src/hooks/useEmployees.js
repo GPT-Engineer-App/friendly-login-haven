@@ -47,7 +47,11 @@ export const useAddEmployee = () => {
     mutationFn: async (newEmployee) => {
       const { data, error } = await supabase
         .from('employees')
-        .insert([newEmployee])
+        .insert([{
+          ...newEmployee,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }])
         .select();
       if (error) {
         console.error('Supabase error:', error);
@@ -70,7 +74,8 @@ export const useUpdateEmployee = () => {
         .from('employees')
         .update({
           ...updates,
-          last_upd_by: user?.id, // Use the current user's ID
+          updated_at: new Date().toISOString(),
+          updated_by: user?.email, // Use the current user's email
         })
         .eq('user_id', id)
         .select();
