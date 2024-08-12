@@ -26,6 +26,18 @@ const UserDashboard = () => {
     { title: 'Designation', value: user?.employeeData?.designation || 'N/A' },
   ];
 
+  const documentTypes = [
+    { value: 'aadhar', label: 'Aadhar Card' },
+    { value: 'pan', label: 'PAN Card' },
+    { value: '10th_marksheet', label: '10th Marksheet' },
+    { value: '12th_marksheet', label: '12th Marksheet' },
+    { value: 'ug_degree', label: 'UG Degree' },
+    { value: 'pg_degree', label: 'PG Degree' },
+    { value: 'diploma', label: 'Diploma' },
+    { value: 'other_certificate', label: 'Other Course Certificate' },
+    { value: 'bank_passbook', label: 'Bank Passbook (Front Page)' },
+  ];
+
   useEffect(() => {
     const fetchDocuments = async () => {
       if (user?.employeeData?.emp_id) {
@@ -154,25 +166,30 @@ const UserDashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {documents.length > 0 ? (
-                  <ul className="space-y-2">
-                    {documents.map((doc) => (
-                      <li key={doc.id} className="flex justify-between items-center">
-                        <span>{doc.file_name}</span>
-                        <div>
-                          <Button variant="ghost" size="sm" onClick={() => handleDownload(doc)}>
-                            <Download className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="sm" onClick={() => handleDelete(doc)}>
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>No documents uploaded yet.</p>
-                )}
+                {documentTypes.map((docType) => (
+                  <div key={docType.value} className="mb-4">
+                    <h3 className="font-semibold mb-2">{docType.label}</h3>
+                    {documents.filter(doc => doc.document_type === docType.value).length > 0 ? (
+                      <ul className="space-y-2">
+                        {documents.filter(doc => doc.document_type === docType.value).map((doc) => (
+                          <li key={doc.id} className="flex justify-between items-center">
+                            <span>{doc.file_name}</span>
+                            <div>
+                              <Button variant="ghost" size="sm" onClick={() => handleDownload(doc)}>
+                                <Download className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="sm" onClick={() => handleDelete(doc)}>
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-sm text-gray-500">No {docType.label} uploaded yet.</p>
+                    )}
+                  </div>
+                ))}
               </CardContent>
             </Card>
             <Card>
