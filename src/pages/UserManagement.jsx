@@ -9,7 +9,7 @@ import Sidebar from '@/components/Sidebar';
 import { useToast } from "@/components/ui/use-toast";
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Pagination } from "@/components/ui/pagination";
+import { Button } from "@/components/ui/button";
 
 const UserManagement = () => {
   const { data: users, isLoading, isError } = useUsers();
@@ -154,11 +154,20 @@ const UserManagement = () => {
                   <div>
                     Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredUsers.length)} of {filteredUsers.length} entries
                   </div>
-                  <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={setCurrentPage}
-                  />
+                  <div>
+                    <Button
+                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
+                    >
+                      Previous
+                    </Button>
+                    <Button
+                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
