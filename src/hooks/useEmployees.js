@@ -61,25 +61,17 @@ export const useAddEmployee = () => {
           throw new Error(error.message);
         }
 
-        // Attempt to create a bucket for the new employee, but don't fail if it doesn't work
-        try {
-          const bucketName = `employee_${data[0].emp_id.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()}`;
-          await supabase.storage.createBucket(bucketName, {
-            public: false,
-            allowedMimeTypes: ['image/png', 'image/jpeg', 'application/pdf'],
-            fileSizeLimit: 5 * 1024 * 1024, // 5MB
-          });
+        // Call the function to create the employee bucket and set up policies
+        const { error: bucketError } = await supabase.rpc('create_employee_bucket', {
+          emp_id: data[0].emp_id,
+          user_id: data[0].user_id
+        });
 
-          // Set up storage policies for the new bucket
-          await supabase.rpc('create_employee_bucket_policies', {
-            bucket_id: bucketName,
-            user_id: data[0].user_id
-          });
-
-          console.log('Employee bucket and policies created successfully');
-        } catch (bucketError) {
-          console.error('Error creating employee bucket or policies:', bucketError);
+        if (bucketError) {
+          console.error('Error creating employee bucket:', bucketError);
           // Don't throw an error here, just log it
+        } else {
+          console.log('Employee bucket and policies created successfully');
         }
 
         return data[0];
