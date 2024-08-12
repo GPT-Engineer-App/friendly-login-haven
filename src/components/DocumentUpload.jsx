@@ -82,12 +82,16 @@ const DocumentUpload = ({ adminMode = false }) => {
       const fileName = `${documentType}_${Math.random().toString(36).substring(2)}.${fileExt}`;
       const folderName = user.employeeData.emp_id.replace(/\//g, '_') + '_kyc';
       const filePath = `${folderName}/${fileName}`;
+      console.log('Uploading file to:', filePath);
 
       const { error: uploadError } = await supabase.storage
         .from('user_documents')
         .upload(filePath, file);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw uploadError;
+      }
 
       const { data: insertData, error: insertError } = await supabase
         .from('documents')
@@ -104,6 +108,15 @@ const DocumentUpload = ({ adminMode = false }) => {
 
       if (insertError) {
         console.error('Error inserting document record:', insertError);
+        console.error('Insert payload:', {
+          user_id: user.id,
+          emp_id: user.employeeData.emp_id,
+          file_name: fileName,
+          file_path: filePath,
+          file_type: file.type,
+          document_type: documentType,
+          uploaded_by: user.id,
+        });
         throw insertError;
       }
 
