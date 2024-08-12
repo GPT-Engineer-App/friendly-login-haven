@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }) => {
 
           setUser({ 
             ...session.user, 
-            role: userData.role === 'admin' ? 'admin' : 'user', // Ensure role is either 'admin' or 'user'
+            role: userData.role === 'admin' ? 'admin' : 'user',
             status: userData.status, 
             emp_id: userData.emp_id,
             employeeData: employeeData

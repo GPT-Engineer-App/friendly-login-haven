@@ -84,9 +84,7 @@ const CreateUser = () => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="admin">Admin</SelectItem>
-                        <SelectItem value="manager">Manager</SelectItem>
                         <SelectItem value="user">User</SelectItem>
-                        <SelectItem value="hr">HR</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
