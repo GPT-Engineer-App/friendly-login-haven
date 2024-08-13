@@ -1,10 +1,13 @@
-import { supabase, supabaseAdmin } from './index';
+import { supabase } from './index';
 import { useQuery } from '@tanstack/react-query';
 
 export const createBucket = async (bucketName) => {
-  const { data, error } = await supabaseAdmin.storage.createBucket(bucketName, { public: false });
-  if (error) {
-    console.error('Supabase createBucket error:', error);
+  try {
+    const { data, error } = await supabase.rpc('create_bucket', { bucket_name: bucketName });
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error creating bucket:', error);
     throw new Error(error.message || 'Failed to create bucket');
   }
   return data;
