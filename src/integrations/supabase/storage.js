@@ -2,7 +2,7 @@ import { supabase } from './index';
 import { useQuery } from '@tanstack/react-query';
 
 export const createBucket = async (bucketName) => {
-  const { data, error } = await supabase.rpc('create_bucket', { bucket_name: bucketName });
+  const { data, error } = await supabase.storage.createBucket(bucketName, { public: false });
   if (error) {
     console.error('Supabase createBucket error:', error);
     throw new Error(error.message || 'Failed to create bucket');
