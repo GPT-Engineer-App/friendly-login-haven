@@ -62,7 +62,8 @@ export const AuthProvider = ({ children }) => {
   const login = async (userData) => {
     setUser({
       ...userData,
-      role: userData.role === 'admin' ? 'admin' : 'user', // Ensure role is either 'admin' or 'user'
+      role: userData.role === 'admin' ? 'admin' : 'user',
+      employeeData: userData.employeeData
     });
   };
 

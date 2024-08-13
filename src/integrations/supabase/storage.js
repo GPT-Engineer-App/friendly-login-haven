@@ -3,14 +3,16 @@ import { useQuery } from '@tanstack/react-query';
 
 export const createBucket = async (bucketName) => {
   try {
-    const { data, error } = await supabase.rpc('create_bucket', { bucket_name: bucketName });
+    const { data, error } = await supabase.storage.createBucket(bucketName, {
+      public: false,
+      fileSizeLimit: 1024 * 1024 * 50, // 50MB
+    });
     if (error) throw error;
     return data;
   } catch (error) {
     console.error('Error creating bucket:', error);
     throw new Error(error.message || 'Failed to create bucket');
   }
-  return data;
 };
 
 export const createFolder = async (bucketName, folderName) => {

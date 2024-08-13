@@ -36,7 +36,7 @@ const Index = () => {
     try {
       const { data: userData, error: userError } = await supabase
         .from('users')
-        .select('user_id, email, password, role, status, emp_id')
+        .select('*')
         .eq('email', email)
         .single();
 
@@ -62,21 +62,12 @@ const Index = () => {
           .eq('emp_id', userData.emp_id)
           .single();
 
-        if (empError) {
-          console.error('Error fetching employee data:', empError);
-        } else {
+        if (!empError) {
           employeeData = empData;
         }
       }
 
-      await login({ 
-        id: userData.user_id, 
-        email: userData.email, 
-        role: userData.role, 
-        status: userData.status,
-        emp_id: userData.emp_id,
-        employeeData: employeeData
-      });
+      await login(userData);
       navigateBasedOnRole(userData.role);
     } catch (error) {
       setError(error.message);
