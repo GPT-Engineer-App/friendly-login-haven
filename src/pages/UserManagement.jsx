@@ -10,13 +10,16 @@ import { useToast } from "@/components/ui/use-toast";
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import ViewModal from '@/components/ViewModal';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, Edit, Trash2, Search } from 'lucide-react';
+import { Eye, Edit, Trash2, Search, FolderPlus, Database } from 'lucide-react';
+import { createBucket, createFolder } from '@/integrations/supabase/storage';
 
 const UserManagement = () => {
   const { data: users, isLoading, isError } = useUsers();
   const deleteUser = useDeleteUser();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [showCreateBucketModal, setShowCreateBucketModal] = useState(false);
+  const [showCreateFolderModal, setShowCreateFolderModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -79,6 +82,40 @@ const UserManagement = () => {
     }
   };
 
+  const handleCreateBucket = async (bucketName) => {
+    try {
+      await createBucket(bucketName);
+      toast({
+        title: "Success",
+        description: `Bucket "${bucketName}" created successfully`,
+      });
+      setShowCreateBucketModal(false);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create bucket",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleCreateFolder = async (bucketName, folderName) => {
+    try {
+      await createFolder(bucketName, folderName);
+      toast({
+        title: "Success",
+        description: `Folder "${folderName}" created successfully in bucket "${bucketName}"`,
+      });
+      setShowCreateFolderModal(false);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create folder",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar />
@@ -119,6 +156,14 @@ const UserManagement = () => {
                     </SelectContent>
                   </Select>
                   <Button onClick={() => navigate('/create-user')}>Add New User</Button>
+                  <Button onClick={() => setShowCreateBucketModal(true)}>
+                    <Database className="mr-2 h-4 w-4" />
+                    Create Bucket
+                  </Button>
+                  <Button onClick={() => setShowCreateFolderModal(true)}>
+                    <FolderPlus className="mr-2 h-4 w-4" />
+                    Create Folder
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -195,6 +240,16 @@ const UserManagement = () => {
           data={selectedUser}
         />
       )}
+      <CreateBucketModal
+        isOpen={showCreateBucketModal}
+        onClose={() => setShowCreateBucketModal(false)}
+        onConfirm={handleCreateBucket}
+      />
+      <CreateFolderModal
+        isOpen={showCreateFolderModal}
+        onClose={() => setShowCreateFolderModal(false)}
+        onConfirm={handleCreateFolder}
+      />
     </div>
   );
 };
