@@ -10,16 +10,16 @@ const queryClient = new QueryClient();
 
 const App = () => {
   return (
-    <AuthProvider>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AuthProvider>
           <TooltipProvider>
             <Toaster />
             <AppRoutes />
           </TooltipProvider>
-        </BrowserRouter>
-      </QueryClientProvider>
-    </AuthProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 };
 
