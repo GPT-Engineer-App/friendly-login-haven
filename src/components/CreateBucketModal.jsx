@@ -3,17 +3,24 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { AlertCircle } from 'lucide-react';
 
 const CreateBucketModal = ({ isOpen, onClose, onConfirm }) => {
   const [bucketName, setBucketName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
     try {
       await onConfirm(bucketName);
       setBucketName('');
+      onClose();
+    } catch (error) {
+      console.error('Error creating bucket:', error);
+      setError(error.message || 'Failed to create bucket. Please try again.');
     } finally {
       setIsLoading(false);
     }

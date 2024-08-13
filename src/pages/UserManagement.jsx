@@ -93,13 +93,13 @@ const UserManagement = () => {
       });
       setShowCreateBucketModal(false);
     } catch (error) {
+      console.error('Error creating bucket:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to create bucket",
         variant: "destructive",
       });
-    } finally {
-      setShowCreateBucketModal(false);
+      throw error; // Re-throw the error to be caught by the modal
     }
   };
 
