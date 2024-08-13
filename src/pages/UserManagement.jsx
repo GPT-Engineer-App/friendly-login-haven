@@ -98,6 +98,8 @@ const UserManagement = () => {
         description: error.message || "Failed to create bucket",
         variant: "destructive",
       });
+    } finally {
+      setShowCreateBucketModal(false);
     }
   };
 

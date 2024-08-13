@@ -6,11 +6,17 @@ import { Label } from "@/components/ui/label";
 
 const CreateBucketModal = ({ isOpen, onClose, onConfirm }) => {
   const [bucketName, setBucketName] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onConfirm(bucketName);
-    setBucketName('');
+    setIsLoading(true);
+    try {
+      await onConfirm(bucketName);
+      setBucketName('');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -30,11 +36,14 @@ const CreateBucketModal = ({ isOpen, onClose, onConfirm }) => {
                 value={bucketName}
                 onChange={(e) => setBucketName(e.target.value)}
                 className="col-span-3"
+                disabled={isLoading}
               />
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit">Create Bucket</Button>
+            <Button type="submit" disabled={isLoading || !bucketName.trim()}>
+              {isLoading ? 'Creating...' : 'Create Bucket'}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
